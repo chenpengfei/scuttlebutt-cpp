@@ -1,0 +1,2 @@
+# scuttlebutt-cpp
+Scuttlebutt C++
