@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+# Jetbrain
+.idea
+
+# Build
+build
+cmake-build-debug
+
+# Coverage Report
+coverage_report
+
+
