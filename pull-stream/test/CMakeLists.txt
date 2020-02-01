@@ -22,10 +22,14 @@ set(SOURCES
   "src/values-test.cpp"
 )
 
-add_executable(pull-stream-test ${INCLUDES} ${SOURCES})
-target_link_libraries(pull-stream-test gtest gtest_main)
+set(PROJECT_NAME pull-stream-test)
+
+add_executable(${PROJECT_NAME} ${INCLUDES} ${SOURCES})
+
+target_link_libraries(${PROJECT_NAME} gtest gtest_main)
+
 if (${ENABLE_COVERAGE})
-  target_link_libraries(pull-stream-test -fprofile-arcs -ftest-coverage)
+  target_link_libraries(${PROJECT_NAME} -fprofile-arcs -ftest-coverage)
 endif ()
 
-add_test(PullStreamUnitTests pull-stream-test)
+add_test(unit-test-pull-stream ${PROJECT_NAME})

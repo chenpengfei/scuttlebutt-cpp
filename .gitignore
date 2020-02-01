@@ -38,7 +38,8 @@
 build
 cmake-build-debug
 
-# Coverage Report
+# Unit test
 coverage_report
+googletest-release-1.8.1/
 
 

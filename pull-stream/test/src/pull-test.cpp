@@ -27,11 +27,12 @@ TEST(combinesSourceWithThrough, pull) {
 
     auto mapper = [&](int val){return val * 2;};
     auto timesTwo = Map<int>(mapper);
+    auto timesFour = pipe_through(timesTwo, timesTwo);
 
-    auto newVals = pull(vals, timesTwo);
+    auto newVals = pull(pull(vals, timesTwo), timesTwo, timesFour);
 
     newVals(false, [](bool done, auto val){
-        ASSERT_EQ(val, 2);
+        ASSERT_EQ(val, 16);
         ASSERT_FALSE(done);
     });
 }

@@ -27,7 +27,7 @@ TEST(combinesThroughWithThrough, pull) {
     auto mapper = [&](int val){return val * 2;};
     auto timesTwo = Map<int>(mapper);
 
-    auto timesFour = pull2(timesTwo, timesTwo);
+    auto timesFour = pipe_through(timesTwo, timesTwo);
     auto newVals = pull(vals, timesFour);
 
     newVals(false, [](bool done, auto val){

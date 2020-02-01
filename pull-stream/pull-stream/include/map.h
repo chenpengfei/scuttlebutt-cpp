@@ -5,13 +5,13 @@
 #ifndef SCUTTLEBUTT_THROUGH_H
 #define SCUTTLEBUTT_THROUGH_H
 
-template <typename T, typename M>
-auto Map(M &&mapper) {
+template<typename T, typename M>
+decltype(auto) Map(M &&mapper) {
 
-    return [&](auto && read){
-        return [&](bool abort, auto cb){
-            read(abort, [&](bool end, T val){
-                if(end)
+    return [&mapper](auto &&read) {
+        return [read, &mapper](bool abort, auto cb) {
+            read(abort, [&](bool end, T val) {
+                if (end)
                     cb(true, val);
                 else
                     cb(false, mapper(val));

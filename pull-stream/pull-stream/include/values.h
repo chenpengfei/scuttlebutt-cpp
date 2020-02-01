@@ -5,16 +5,15 @@
 #ifndef SCUTTLEBUTT_SOURCE_H
 #define SCUTTLEBUTT_SOURCE_H
 
-template <typename T>
-auto values(T &&begin, T &&end) {
+template<typename T>
+decltype(auto) values(T &begin, T &end) {
 
-    return [&](bool abort, auto cb){
+    return [&begin, &end](bool abort, auto cb) {
 
-        if(begin != end){
+        if (abort || (begin == end)) {
+            cb(true, -1);
+        } else {
             cb(false, *begin++);
-        }
-        else{
-            cb(true, *begin);
         }
     };
 }

@@ -5,11 +5,12 @@
 #ifndef SCUTTLEBUTT_SINK_H
 #define SCUTTLEBUTT_SINK_H
 
-template <typename T, typename R>
-auto log(R read){
+template<typename T, typename R>
+decltype(auto) log(R &&read) {
 
-    std::function<void (bool, T)> more = [&](bool done, T val){
-        if(!done){
+    std::function<void(bool, T)> more = [&](bool done, T val) {
+        if (!done) {
+            std::cout << val << std::endl;
             read(false, more);
         }
     };
