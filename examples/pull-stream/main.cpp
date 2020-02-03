@@ -15,7 +15,7 @@
 using namespace std;
 
 int main() {
-    int n = 5;
+    int n = 5000000;
     vector<int> vec;
     vec.reserve(n);
     for (auto i = 1; i < n; ++i) {
@@ -30,12 +30,17 @@ int main() {
     auto timesFour = pipe_through(timesTwo, timesTwo);
     auto logInt = [&] (auto read) { log<int>(read); };
 
-    pull(pull(vals, timesTwo, timesFour, timesTwo, timesFour),
-            timesTwo,
-            pipe_through(timesTwo, timesTwo),
-            timesFour,
-            timesTwo,
-            pipe_through(timesTwo, timesFour, timesTwo, timesFour, logInt));
+    auto newVals = pull(vals, timesTwo, timesFour);
+    auto newLogInt = pipe_through(timesTwo, timesTwo, timesFour, logInt);
+
+    pull(vals, timesTwo, logInt);
+
+//    pull(newVals,
+//            timesTwo,
+//            pipe_through(timesTwo, timesTwo),
+//            timesFour,
+//            timesTwo,
+//            newLogInt);
 
     puts("over");
 

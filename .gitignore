@@ -42,4 +42,7 @@ cmake-build-debug
 coverage_report
 googletest-release-1.8.1/
 
+# Other
+doc
+
 
