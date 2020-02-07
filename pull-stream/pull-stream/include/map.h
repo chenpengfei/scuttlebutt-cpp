@@ -11,7 +11,8 @@ decltype(auto) Map(M &&mapper) {
     return [&mapper](auto &&read) {
         return [read, &mapper](bool abort, auto cb) {
             read(abort, [&](bool end, T val) {
-                if (end)
+                bool ended = abort || end;
+                if (ended)
                     cb(true, val);
                 else
                     cb(false, mapper(val));
