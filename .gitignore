@@ -37,6 +37,7 @@
 # Build
 build
 cmake-build-debug
+cmake-build-release
 
 # Unit test
 coverage_report
