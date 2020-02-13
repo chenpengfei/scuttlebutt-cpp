@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "event_loop.h"
+#include "spdlog/spdlog.h"
 
 using namespace std;
 using namespace nonstd;
@@ -91,7 +92,7 @@ void EventLoop::work_thread() {
         delete event;
     }
 
-    cout << "Exit work thread on " << THREAD_NAME_ << endl;
+    spdlog::info("Exit work thread on {}",  THREAD_NAME_);
 }
 
 bool EventLoop::emit(string eventName, any arg) {

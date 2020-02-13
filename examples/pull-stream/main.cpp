@@ -4,11 +4,11 @@
 #include <deque>
 #include <vector>
 #include <iterator>
-#include <iostream>
 #include <pull.h>
 #include <log.h>
 #include <values.h>
 #include <map.h>
+#include "spdlog/spdlog.h"
 
 using namespace std;
 
@@ -31,12 +31,11 @@ void test_pull_stream_with_promise() {
     auto newVals = pull(vals, timesTwo, timesFour);
 
     const clock_t begin_time = clock();
+
     pull(vals, timesTwo, logInt);
-    std::cout << "test_pull_stream_with_promise cost: "
-        << float( clock () - begin_time ) /  (CLOCKS_PER_SEC/1000)
-        << " ms"
-        << std::endl
-        << std::endl;
+
+    spdlog::info("test_pull_stream_with_promise cost: {}ms",
+            float( clock () - begin_time ) /  (CLOCKS_PER_SEC/1000));
 
 }
 
@@ -60,17 +59,16 @@ void test_pull_stream_with_condition_variable() {
     auto newLogInt = pipe_through(timesTwo, timesTwo, timesFour, logInt);
 
     const clock_t begin_time = clock();
+
     pull(newVals,
             timesTwo,
             pipe_through(timesTwo, timesTwo),
             timesFour,
             timesTwo,
             newLogInt);
-    std::cout << "test_pull_stream_with_condition_variable cost: "
-              << float( clock () - begin_time ) /  (CLOCKS_PER_SEC/1000)
-              << " ms"
-              << std::endl
-              << std::endl;
+
+    spdlog::info("test_pull_stream_with_condition_variable cost: {}ms",
+                 float( clock () - begin_time ) /  (CLOCKS_PER_SEC/1000));
 }
 
 int main() {

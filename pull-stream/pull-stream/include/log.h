@@ -8,13 +8,14 @@
 #include <condition_variable>
 #include <future>
 #include <utility>
+#include "spdlog/spdlog.h"
 
 template<typename T, typename R>
 decltype(auto) log_with_recursive(R &&read) {
 
     std::function<void(bool, T)> more = [&](bool done, T val) {
         if (!done) {
-            std::cout << val << std::endl;
+            spdlog::info(val);
             read(false, more);
         }
     };
@@ -35,7 +36,7 @@ decltype(auto) log_with_condition_variable(R &&read) {
         read(false, [&read, &ended, &ready, &m, &cv](bool done, T val) {
             ended = done;
             if (!ended) {
-                std::cout << val << std::endl;
+                spdlog::info(val);
             }
 
             {
@@ -63,7 +64,7 @@ decltype(auto) log_with_promise(R &&read) {
         read(false, [&read, &ended, &prom](bool done, T val) {
             ended = done;
             if (!ended) {
-                std::cout << val << std::endl;
+                spdlog::info(val);
             }
 
             prom.set_value();
