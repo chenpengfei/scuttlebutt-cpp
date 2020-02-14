@@ -1,4 +1,6 @@
 #include <assert.h>
+
+#include <utility>
 #include "event_loop.h"
 #include "spdlog/spdlog.h"
 
@@ -95,29 +97,29 @@ void EventLoop::work_thread() {
     spdlog::info("Exit work thread on {}",  THREAD_NAME_);
 }
 
-bool EventLoop::emit(string eventName, any arg) {
+bool EventLoop::emit(const std::string& eventName, any arg) {
     assert(work_thread_);
 
-    push(new Event(eventName, arg));
+    push(new Event(eventName, std::move(arg)));
     return true;
 }
 
-EventLoop &EventLoop::on(string eventName, const Handler &listener) {
+EventLoop &EventLoop::on(const string& eventName, const Handler &listener) {
     add_listener(eventName, listener, false);
     return *this;
 }
 
-EventLoop &EventLoop::once(string eventName, const Handler &listener) {
+EventLoop &EventLoop::once(const string& eventName, const Handler &listener) {
     add_listener(eventName, listener, true);
     return *this;
 }
 
-EventLoop &EventLoop::remove_all_listener(std::string eventName) {
+EventLoop &EventLoop::remove_all_listener(const std::string& eventName) {
     listeners_.erase(eventName);
     return *this;
 }
 
-int EventLoop::listener_count(std::string eventName) {
+int EventLoop::listener_count(const std::string& eventName) {
     auto it = listeners_.find(eventName);
     if (it == listeners_.end()) {
         return 0;
@@ -126,7 +128,7 @@ int EventLoop::listener_count(std::string eventName) {
     }
 }
 
-void EventLoop::add_listener(std::string eventName, const Handler &listener, bool once) {
+void EventLoop::add_listener(const std::string& eventName, const Handler &listener, bool once) {
     auto it = listeners_.find(eventName);
     if (it == listeners_.end()) {
         std::vector<EventHandler> vec;

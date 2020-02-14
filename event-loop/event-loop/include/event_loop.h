@@ -8,12 +8,13 @@
 #include <atomic>
 #include <map>
 #include <condition_variable>
+#include <utility>
 #include <nonstd/any.h>
 
 using Handler = std::function<void(nonstd::any)>;
 
 struct EventHandler {
-    EventHandler(const Handler &handler, bool once) : handler_(handler), once_(once) {
+    EventHandler(Handler handler, bool once) : handler_(std::move(handler)), once_(once) {
     }
 
     Handler handler_;
@@ -21,21 +22,21 @@ struct EventHandler {
 };
 
 struct Event {
-    Event(std::string name, nonstd::any arg) : name_(name),
-                                               arg_(arg) {
+    Event(std::string  name, nonstd::any arg) : name_(std::move(name)),
+                                               arg_(std::move(arg)) {
     }
 
     std::string name_;
     nonstd::any arg_;
 };
 
-class EventLoop {
+class EventLoop final {
 public:
     EventLoop(const EventLoop &) = delete;
 
     EventLoop &operator=(const EventLoop &) = delete;
 
-    EventLoop(const char *threadName);
+    explicit EventLoop(const char *threadName);
 
     ~EventLoop();
 
@@ -70,7 +71,7 @@ public:
      * @param[in] arg - the argument passed to the listeners registered for the event name
      * @return Returns true if the event had listeners, false otherwise.
      */
-    bool emit(std::string eventName, nonstd::any arg);
+    bool emit(const std::string& eventName, nonstd::any arg);
 
     /**
      * Adds the listener function to the end of the listeners array for the event named eventName.
@@ -82,20 +83,20 @@ public:
      * @param listener - The callback function
      * @return Returns a reference to the EventEmitter, so that calls can be chained.
      */
-    EventLoop &on(std::string eventName, const Handler &listener);
+    EventLoop & on(const std::string& eventName, const Handler &listener);
 
     /**
      * Adds a one-time listener function for the event named eventName.
      * The next time eventName is triggered, this listener is removed and then invoked.
      *
      */
-    EventLoop &once(std::string eventName, const Handler &listener);
+    EventLoop & once(const std::string& eventName, const Handler &listener);
 
     /**
      * Removes all listeners, or those of the specified eventName.
      *
      */
-    EventLoop &remove_all_listener(std::string eventName);
+    EventLoop & remove_all_listener(const std::string& eventName);
 
     /**
      * Returns the number of listeners listening to the event named eventName.
@@ -103,7 +104,7 @@ public:
      * @param eventName - The name of the event being listened for
      * @return
      */
-    int listener_count(std::string eventName);
+    int listener_count(const std::string& eventName);
 
 private:
     // Entry point for the worker thread
@@ -113,7 +114,7 @@ private:
     void push(Event *event);
 
     // Add listener for the event named eventName
-    void add_listener(std::string eventName, const Handler &listener, bool once = false);
+    void add_listener(const std::string& eventName, const Handler &listener, bool once = false);
 
     const char *THREAD_NAME_;
     std::atomic<bool> work_thread_exit_;
