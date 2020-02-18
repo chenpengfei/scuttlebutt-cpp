@@ -52,9 +52,11 @@ TEST(once, event_emitter) {
     ASSERT_EQ(1, foo_1.sum_);
 
     foo foo_2;
-    foo_2.on(name, foo_2.get_adder());
+    foo_2.once(name, foo_2.get_adder());
+    ASSERT_EQ(1, foo_2.listener_count(name));
     foo_2.emit(name, 3);
     ASSERT_EQ(3, foo_2.sum_);
+    ASSERT_EQ(0, foo_2.listener_count(name));
 }
 
 TEST(remove_listener, event_emitter) {

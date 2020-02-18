@@ -75,17 +75,14 @@ void EventLoop::work_thread() {
             queue_.pop();
         }
 
-        auto map_it = listeners_.find(event->name_);
-        if (map_it != listeners_.end()) {
-            auto &eh = map_it->second;
-            auto it = eh.begin();
-            while (it != eh.end()) {
+        auto cbs_it = listeners_.find(event->name_);
+        if (cbs_it != listeners_.end()) {
+            for (auto it = cbs_it->second.begin(); it != cbs_it->second.end();) {
+                it->handler_(event->arg_);
+
                 if (it->once_) {
-                    auto _h = it->handler_;
-                    it = eh.erase(it);
-                    _h(event->arg_);
+                    it = cbs_it->second.erase(it);
                 } else {
-                    it->handler_(event->arg_);
                     ++it;
                 }
             }
