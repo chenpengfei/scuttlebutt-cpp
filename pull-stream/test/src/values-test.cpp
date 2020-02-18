@@ -5,9 +5,6 @@
 #include <deque>
 #include <vector>
 #include <iterator>
-#include <functional>
-#include <iostream>
-#include <cstdarg>
 #include "gtest/gtest.h"
 #include <pull.h>
 #include <values.h>

@@ -39,7 +39,8 @@ project(scuttlebutt-cpp)
 include_directories(include)
 
 add_subdirectory(pull-stream)
+add_subdirectory(event-emitter)
 add_subdirectory(event-loop)
-add_subdirectory(examples)
+add_subdirectory(scuttlebutt-pull)
 
 
