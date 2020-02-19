@@ -36,11 +36,14 @@ endif ()
 
 project(scuttlebutt-cpp)
 
-include_directories(include)
+include_directories(
+        include
+        event-emitter/event-emitter/include)
 
 add_subdirectory(pull-stream)
 add_subdirectory(event-emitter)
 add_subdirectory(event-loop)
+add_subdirectory(monotonic-timestamp)
 add_subdirectory(scuttlebutt-pull)
 
 
