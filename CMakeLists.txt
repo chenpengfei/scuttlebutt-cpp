@@ -38,9 +38,16 @@ project(scuttlebutt-cpp)
 
 include_directories(
         include
-        event-emitter/event-emitter/include)
+        pull-stream
+        duplex-pull
+        event-emitter
+        event-loop
+        monotonic-timestamp
+        scuttlebutt-pull
+)
 
 add_subdirectory(pull-stream)
+add_subdirectory(duplex-pull)
 add_subdirectory(event-emitter)
 add_subdirectory(event-loop)
 add_subdirectory(monotonic-timestamp)

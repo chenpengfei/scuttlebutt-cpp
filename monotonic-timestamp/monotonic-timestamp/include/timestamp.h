@@ -5,10 +5,12 @@
 #ifndef SCUTTLEBUTT_TIMESTAMP_H
 #define SCUTTLEBUTT_TIMESTAMP_H
 
-// If `system_clock::now()` is invoked twice quickly, it's possible to get two
-// identical time stamps. To avoid generation duplications, subsequent
-// calls are manually ordered to force uniqueness.
+namespace monotonic_timestamp {
+    // If `system_clock::now()` is invoked twice quickly, it's possible to get two
+    // identical time stamps. To avoid generation duplications, subsequent
+    // calls are manually ordered to force uniqueness.
 
-long timestamp();
+    long timestamp();
+}
 
 #endif //SCUTTLEBUTT_TIMESTAMP_H

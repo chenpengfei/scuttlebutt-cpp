@@ -1,5 +1,9 @@
-#ifndef _THREAD_STD_H
-#define _THREAD_STD_H
+//
+// Created by 陈鹏飞 on 2020/2/19.
+//
+
+#ifndef SCUTTLEBUTT_EVENT_LOOP_H
+#define SCUTTLEBUTT_EVENT_LOOP_H
 
 #include <iostream>
 #include <thread>
@@ -23,7 +27,7 @@ struct EventHandler {
 
 struct Event {
     Event(std::string  name, nonstd::any arg) : name_(std::move(name)),
-                                               arg_(std::move(arg)) {
+                                                arg_(std::move(arg)) {
     }
 
     std::string name_;
@@ -127,5 +131,4 @@ private:
     static const char *EXIT_THREAD_EVENT_NAME;
 };
 
-#endif 
-
+#endif //SCUTTLEBUTT_EVENT_LOOP_H

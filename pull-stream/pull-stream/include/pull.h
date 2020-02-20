@@ -5,6 +5,8 @@
 #ifndef SCUTTLEBUTT_PULL_H
 #define SCUTTLEBUTT_PULL_H
 
+#include <iostream>
+
 template<typename T>
 decltype(auto) pull(T &&stream) {
     return stream;

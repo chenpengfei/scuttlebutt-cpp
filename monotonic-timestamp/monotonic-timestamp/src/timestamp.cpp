@@ -5,25 +5,28 @@
 #include <chrono>
 #include <thread>
 
-long _last = 0;
+namespace monotonic_timestamp {
+    long _last = 0;
 
-inline long now() {
-    return std::chrono::duration_cast< std::chrono::milliseconds >(
-            std::chrono::system_clock::now().time_since_epoch()
-    ).count();
-}
-
-long timestamp() {
-    long time = now();
-
-    if (_last == time)  {
-        do {
-            std::this_thread::sleep_for(std::chrono::milliseconds (1));
-            time = now();
-        } while (_last == time);
+    inline long now() {
+        return std::chrono::duration_cast< std::chrono::milliseconds >(
+                std::chrono::system_clock::now().time_since_epoch()
+        ).count();
     }
 
-    _last = time;
-    return time;
+    long timestamp() {
+        long time = now();
+
+        if (_last == time)  {
+            do {
+                std::this_thread::sleep_for(std::chrono::milliseconds (1));
+                time = now();
+            } while (_last == time);
+        }
+
+        _last = time;
+        return time;
+    }
 }
+
 
