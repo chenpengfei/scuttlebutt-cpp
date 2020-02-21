@@ -34,9 +34,10 @@ namespace sb {
         nonstd::any get_without_clock(const std::string &k) {
             auto it = store_.find(k);
             if (it != store_.end()) {
+                auto update = nonstd::any_cast<sb::update>(it->second);
+                auto data = std::get<update_items::Data>(update);
                 return std::get<model_value_items::Value>(
-                        nonstd::any_cast<std::pair<std::string, nonstd::any>>(
-                                std::get<update_items::Data>(*it)));
+                        nonstd::any_cast<std::pair<std::string, nonstd::any>>(data));
             }
             return nullptr;
         }
@@ -56,7 +57,7 @@ namespace sb {
                 return (std::find(whitelist.begin(), whitelist.end(), key) != whitelist.end())? true: false;
             }
 
-            return false;
+            return true;
         }
 
         bool apply_updates(const update &u) {

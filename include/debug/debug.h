@@ -36,11 +36,16 @@ protected:
         std::cout << std::flush;
     }
 
+public:
+    static spdlog::string_view_t last_logger_name_;
+
 private:
-    spdlog::string_view_t last_logger_name_;
     const std::string pattern_ = "[%^%L%$] %-10n %v";
     const std::string pattern_without_logger_name_ = "[%^%L%$]            %v";
 };
+
+template<class Mutex>
+spdlog::string_view_t my_sink<Mutex>::last_logger_name_ = "";
 
 #include "spdlog/details/null_mutex.h"
 #include <mutex>
