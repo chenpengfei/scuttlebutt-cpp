@@ -5,6 +5,8 @@
 #include "timestamp.h"
 #include "spdlog/spdlog.h"
 
+using namespace monotonic_timestamp;
+
 int main() {
     auto t1 = timestamp();
     auto t2 = timestamp();

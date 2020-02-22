@@ -25,7 +25,7 @@ int main() {
     auto s1 = a.create_stream(stream_options("a->b"));
     auto s2 = b.create_stream(stream_options("b->a"));
 
-    a.set("foo", "changed by A");
+//    a.set("foo", "changed by A");
 
     std::function<void()> cb = [&b](){
         print_key_value(b, "foo");
@@ -34,6 +34,10 @@ int main() {
 
     link(s1, s2);
 
+//    int counter = 500000;
+//    while(counter-- >= 0) {
+//        a.set("foo", "changed by A ->" + std::to_string(counter));
+//    }
 
     delete s1;
     delete s2;

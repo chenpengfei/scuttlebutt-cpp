@@ -3,7 +3,7 @@
 //
 
 #include "gtest/gtest.h"
-#include "utils.h"
+#include "scuttlebutt.h"
 
 using namespace std;
 using namespace sb;

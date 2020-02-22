@@ -5,6 +5,8 @@
 #include "gtest/gtest.h"
 #include "timestamp.h"
 
+using namespace monotonic_timestamp;
+
 // assert that timestamps are strictly increasing!
 TEST(timestamp, monotonic_timestamp) {
     auto max = 1000;

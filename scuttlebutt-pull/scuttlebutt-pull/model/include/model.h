@@ -39,7 +39,7 @@ namespace sb {
                 return std::get<model_value_items::Value>(
                         nonstd::any_cast<std::pair<std::string, nonstd::any>>(data));
             }
-            return nullptr;
+            return std::string("");
         }
 
         bool is_accepted(const model_accept &peer_accept, const update &u) {
