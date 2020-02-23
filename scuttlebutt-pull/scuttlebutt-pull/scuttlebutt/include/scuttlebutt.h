@@ -68,7 +68,8 @@ namespace sb {
         Singed,
     };
 
-    using update = std::tuple<nonstd::any, timestamp, source_id, from, singed>;
+    using update_data = std::pair<std::string, nonstd::any>;
+    using update = std::tuple<update_data, timestamp, source_id, from, singed>;
     using verify = std::function<bool(const update &)>;
     using sign = std::function<singed(const update &)>;
 

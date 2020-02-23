@@ -11,4 +11,7 @@ mkdir -p build && cd build && cmake .. && make && ./scuttlebutt-pull/examples/sc
 export ENABLE_COVERAGE=OFF && export GTEST_LATEST=OFF && ./make_all.sh
 ```
 
+## License
+MIT
+
 

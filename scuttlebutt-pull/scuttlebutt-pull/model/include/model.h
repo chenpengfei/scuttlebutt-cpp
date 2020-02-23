@@ -31,82 +31,23 @@ namespace sb {
             return update{};
         }
 
-        nonstd::any get_without_clock(const std::string &k) {
+        template <typename ValueType>
+        ValueType get_without_clock(const std::string &k) {
             auto it = store_.find(k);
             if (it != store_.end()) {
                 auto update = nonstd::any_cast<sb::update>(it->second);
                 auto data = std::get<update_items::Data>(update);
-                return std::get<model_value_items::Value>(
-                        nonstd::any_cast<std::pair<std::string, nonstd::any>>(data));
+                auto data_value = std::get<model_value_items::Value>(data);
+                return nonstd::any_cast<ValueType>(data_value);
             }
-            return std::string("");
+            return ValueType{};
         }
 
-        bool is_accepted(const model_accept &peer_accept, const update &u) {
-            auto &blacklist = peer_accept.blacklist_;
-            auto &whitelist = peer_accept.whitelist_;
-            auto key = std::get<model_value_items::Key>(
-                    nonstd::any_cast<std::pair<std::string, nonstd::any>>(
-                            std::get<update_items::Data>(u)));
+        bool is_accepted(const model_accept &peer_accept, const update &u) override;
 
-            if (!blacklist.empty() && std::find(blacklist.begin(), blacklist.end(), key) != blacklist.end()) {
-                return false;
-            }
+        bool apply_updates(const update &u) override;
 
-            if (!whitelist.empty()) {
-                return (std::find(whitelist.begin(), whitelist.end(), key) != whitelist.end())? true: false;
-            }
-
-            return true;
-        }
-
-        bool apply_updates(const update &u) {
-            auto key = std::get<model_value_items::Key>(
-                    nonstd::any_cast<std::pair<std::string, nonstd::any>>(
-                            std::get<update_items::Data>(u)));
-
-            // ignore if we already have a more recent value
-            auto it = store_.find(key);
-            if (it != store_.end()) {
-                if (std::get<update_items::Timestamp>(it->second) > std::get<update_items::Timestamp>(u)) {
-                    emit("_remove", u);
-                    return false;
-                }
-
-                emit("_remove", *it);
-            }
-
-            store_[key] = u;
-
-            emit("update", u);
-            auto value = std::get<model_value_items::Value>(
-                    nonstd::any_cast<std::pair<std::string, nonstd::any>>(
-                            std::get<update_items::Data>(u)));
-            emit("changed", key, value);
-            emit("changed:" + key, value);
-
-            if (std::get<update_items::SourceId>(u) != id_) {
-                emit("changedByPeer", key, value, std::get<update_items::From>(u));
-            }
-
-            return true;
-        }
-
-        std::vector<update> history(const sources &peer_sources, const model_accept &peer_accept) {
-            std::vector<update> h;
-
-            for (auto it = store_.begin(); it != store_.end(); ++it) {
-                auto &update = it->second;
-                if (!is_accepted(peer_accept, update)) {
-                    break;
-                }
-                if (_filter(update, peer_sources)) {
-                    h.push_back(update);
-                }
-            }
-            _sort(h);
-            return h;
-        }
+        std::vector<update> history(const sources &peer_sources, const model_accept &peer_accept) override;
 
     private:
         std::map<std::string, update> store_;

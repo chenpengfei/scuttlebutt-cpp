@@ -28,8 +28,8 @@ namespace sb {
 
     bool scuttlebutt::_update(update update) {
         logger->info("_update: [ [{} {}] {} {} ]",
-                std::get<model_value_items::Key>(nonstd::any_cast<std::pair<std::string, nonstd::any>>(std::get<sb::update_items::Data>(update))),
-                     nonstd::any_cast<std::string>(std::get<model_value_items::Value>(nonstd::any_cast<std::pair<std::string, nonstd::any>>(std::get<sb::update_items::Data>(update)))),
+                std::get<model_value_items::Key>(std::get<sb::update_items::Data>(update)),
+                     nonstd::any_cast<std::string>(std::get<model_value_items::Value>(std::get<sb::update_items::Data>(update))),
                      std::get<sb::update_items::Timestamp>(update), std::get<sb::update_items::SourceId>(update) );//todo
 
         auto ts = std::get<update_items::Timestamp>(update);

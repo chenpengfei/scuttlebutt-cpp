@@ -11,7 +11,7 @@
 using namespace sb;
 
 void print_key_value(model model, const std::string &k) {
-    std::string v = nonstd::any_cast<std::string>(model.get_without_clock(k));
+    std::string v = nonstd::any_cast<std::string>(model.get_without_clock<std::string>(k));
     spdlog::info("model id: {}, key: {}, value {}", model.id_, k, v);
 }
 
@@ -25,7 +25,7 @@ int main() {
     auto s1 = a.create_stream(stream_options("a->b"));
     auto s2 = b.create_stream(stream_options("b->a"));
 
-//    a.set("foo", "changed by A");
+    a.set("foo", "changed by A");
 
     std::function<void()> cb = [&b](){
         print_key_value(b, "foo");
