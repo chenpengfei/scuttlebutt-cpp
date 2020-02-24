@@ -9,7 +9,7 @@ using namespace monotonic_timestamp;
 
 // assert that timestamps are strictly increasing!
 TEST(timestamp, monotonic_timestamp) {
-    auto max = 1000;
+    auto max = 1000000;
     auto l = max;
     auto prev = 0;
 

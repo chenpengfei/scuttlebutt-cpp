@@ -3,29 +3,43 @@
 //
 
 #include <chrono>
-#include <thread>
 
 namespace monotonic_timestamp {
-    long _last = 0;
+    double _last = 0;;
+    double _count = 1;
+    double adjusted = 0;
+    double _adjusted = 0;
 
-    inline long now() {
-        return std::chrono::duration_cast< std::chrono::milliseconds >(
+    inline double now() {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now().time_since_epoch()
         ).count();
     }
 
-    long timestamp() {
-        long time = now();
+    double timestamp() {
+        auto time = now();
 
-        if (_last == time)  {
+        /**
+          If time returned is same as in last call, adjust it by
+          adding a number based on the counter.
+          Counter is incremented so that next call get's adjusted properly.
+          Because floats have restricted precision,
+          may need to step past some values...
+          **/
+        if (_last == time) {
             do {
-                std::this_thread::sleep_for(std::chrono::milliseconds (1));
-                time = now();
-            } while (_last == time);
+                adjusted = time + ((++_count) / (_count + 999));
+            } while (adjusted == _adjusted);
+            _adjusted = adjusted;
         }
-
+            // If last time was different reset timer back to `1`.
+        else {
+            _count = 1;
+            adjusted = time;
+        }
+        _adjusted = adjusted;
         _last = time;
-        return time;
+        return adjusted;
     }
 }
 

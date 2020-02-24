@@ -18,7 +18,7 @@
 namespace sb {
 
     using source_id = std::string;
-    using timestamp = long;
+    using timestamp = double;
     using from = std::string;
     using singed = std::string;
 

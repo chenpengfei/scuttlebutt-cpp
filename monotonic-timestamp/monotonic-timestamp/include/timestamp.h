@@ -10,7 +10,7 @@ namespace monotonic_timestamp {
     // identical time stamps. To avoid generation duplications, subsequent
     // calls are manually ordered to force uniqueness.
 
-    long timestamp();
+    double timestamp();
 }
 
 #endif //SCUTTLEBUTT_TIMESTAMP_H
