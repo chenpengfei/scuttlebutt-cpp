@@ -14,12 +14,14 @@ namespace sb {
         auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
         auto key = std::get<model_value_items::Key>(data);
 
-        if (!blacklist.empty() && std::find(blacklist.begin(), blacklist.end(), key) != blacklist.end()) {
+        if (!blacklist.empty() &&
+            std::find(blacklist.begin(), blacklist.end(), key) != blacklist.end()) {
             return false;
         }
 
         if (!whitelist.empty()) {
-            return (std::find(whitelist.begin(), whitelist.end(), key) != whitelist.end())? true: false;
+            return (std::find(whitelist.begin(), whitelist.end(), key) != whitelist.end()) ? true
+                                                                                           : false;
         }
 
         return true;
@@ -33,7 +35,8 @@ namespace sb {
         // ignore if we already have a more recent value
         auto it = store_.find(key);
         if (it != store_.end()) {
-            if (std::get<update_items::Timestamp>(it->second) > std::get<update_items::Timestamp>(u)) {
+            if (std::get<update_items::Timestamp>(it->second) >
+                std::get<update_items::Timestamp>(u)) {
                 emit("_remove", u);
                 return false;
             }
@@ -55,7 +58,8 @@ namespace sb {
         return true;
     }
 
-    std::vector<update> model::history(const sources &peer_sources, const model_accept &peer_accept) {
+    std::vector<update>
+    model::history(const sources &peer_sources, const model_accept &peer_accept) {
         std::vector<update> h;
 
         for (auto it = store_.begin(); it != store_.end(); ++it) {

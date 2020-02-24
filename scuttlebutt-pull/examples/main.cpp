@@ -27,7 +27,7 @@ int main() {
 
     a.set("foo", "changed by A");
 
-    std::function<void()> cb = [&b](){
+    std::function<void()> cb = [&b]() {
         print_key_value(b, "foo");
     };
     s2->on("synced", cb);

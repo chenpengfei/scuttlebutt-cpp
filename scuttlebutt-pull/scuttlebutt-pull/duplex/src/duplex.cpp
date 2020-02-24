@@ -10,7 +10,7 @@ namespace sb {
     dp::read &sb::duplex::get_raw_source() {
         if (!raw_source_) {
             decltype(auto) self = this;
-            raw_source_ = [self](bool abort, dp::source_callback cb){
+            raw_source_ = [self](bool abort, dp::source_callback cb) {
                 if (abort) {
                     self->abort_ = abort;
                     // if there is already a cb waiting, abort it.
@@ -24,8 +24,8 @@ namespace sb {
                     auto outgoing = self->get_outgoing();
                     self->push(outgoing, true);
                     self->logger->info("sent 'outgoing': {} [{} {}]",
-                                 outgoing.id_, outgoing.clock_.begin()->first,
-                                 outgoing.clock_.begin()->second);//todo.outgoing
+                                       outgoing.id_, outgoing.clock_.begin()->first,
+                                       outgoing.clock_.begin()->second);//todo.outgoing
                 }
 
                 self->cb_ = std::move(cb);
@@ -48,12 +48,14 @@ namespace sb {
                     }
 
                     if (u.type() == typeid(sb::update)) {
-                        self->logger->info("sink reads data from peer({}): {}", self->peer_id_,"update");//todo
+                        self->logger->info("sink reads data from peer({}): {}", self->peer_id_,
+                                           "update");//todo
 
                         // counting the update that current stream received
                         ++(self->received_counter_);
-                        self->emit("updateReceived", self, u, self->received_counter_,
-                             std::string(self->sb_->id_ + "/" + self->name_));
+                        self->emit("updateReceived", (dp::duplex_base *) self, u,
+                                   self->received_counter_,
+                                   std::string(self->sb_->id_ + "/" + self->name_));
 
                         if (!self->writable_) { return; }
 
@@ -82,7 +84,7 @@ namespace sb {
                         outgoing o = nonstd::any_cast<outgoing>(u);
                         self->logger->info("sink reads data from peer({}): {} [{} {}]",
                                            self->peer_id_, o.id_, o.clock_.begin()->first,
-                                     o.clock_.begin()->second);//todo
+                                           o.clock_.begin()->second);//todo
 
                         if (self->readable_) {
                             // it's a scuttlebutt digest(vector clocks)
@@ -213,13 +215,14 @@ namespace sb {
 
     void duplex::start(const outgoing &incoming) {
         logger->info("start with data: {} [{} {}]",
-                     incoming.id_, incoming.clock_.begin()->first,incoming.clock_.begin()->second);//todo
+                     incoming.id_, incoming.clock_.begin()->first,
+                     incoming.clock_.begin()->second);//todo
 
         peer_sources_ = incoming.clock_;
         peer_id_ = incoming.id_;
         peer_accept_ = incoming.accept_;
 
-        std::function<void()> rest = [this, &incoming](){
+        std::function<void()> rest = [this, &incoming]() {
             // when we have sent all history
             emit("header", incoming);
             // when we have received all history

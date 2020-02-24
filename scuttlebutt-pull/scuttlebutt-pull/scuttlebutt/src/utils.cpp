@@ -7,7 +7,8 @@
 namespace sb {
 
     std::string _create_id() {
-        char hex_characters[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
+        char hex_characters[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C',
+                                 'D',
                                  'E', 'F'};
 
         std::string id;

@@ -91,7 +91,7 @@ namespace sb {
 
         void drain();
 
-        void callback(bool end, const nonstd::any& data = nonstd::any()) {
+        void callback(bool end, const nonstd::any &data = nonstd::any()) {
             auto cb = cb_;
             if (end && on_close_) {
                 auto c = on_close_;
@@ -106,7 +106,8 @@ namespace sb {
                 if (data.type() == typeid(sb::update)) {
                     // if payload is an update
                     ++sent_counter_;
-                    emit("updateSent", this, data, sent_counter_, std::string(sb_->id_ + "/" + name_));
+                    emit("updateSent", (dp::duplex_base *) this, data, sent_counter_,
+                         std::string(sb_->id_ + "/" + name_));
                 }
             }
         }
@@ -116,7 +117,7 @@ namespace sb {
         }
 
         // process any update occurred on sb
-        std::function<void(sb::update&)> &get_on_update() {
+        std::function<void(sb::update &)> &get_on_update() {
             if (on_update_ == nullptr) {
                 on_update_ = [this](sb::update update) {
                     logger->info("got 'update on stream: {}", "update");//todo
@@ -138,7 +139,8 @@ namespace sb {
                     bool is_accepted = sb_->is_accepted(peer_accept_, update);
 
                     if (!is_accepted) {
-                        logger->info("'update ignored by peerAccept: {} {}", "update", "peer_accept_");//todo
+                        logger->info("'update ignored by peerAccept: {} {}", "update",
+                                     "peer_accept_");//todo
                         return;
                     }
 

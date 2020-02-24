@@ -73,7 +73,9 @@ namespace sb {
     using sign = std::function<singed(const update &)>;
 
     std::string _create_id();
+
     bool _filter(const sb::update &update, const sb::sources &sources);
+
     void _sort(std::vector<sb::update> &hist);
 
     class scuttlebutt : public event_emitter {
@@ -99,15 +101,22 @@ namespace sb {
         bool _update(update update);
 
         dp::duplex_base *create_stream(const stream_options &opts);
+
         dp::duplex_base *create_write_stream(stream_options &opts);
+
         dp::duplex_base *create_sink_stream(stream_options &opts);
+
         dp::duplex_base *create_read_stream(stream_options &opts);
+
         dp::duplex_base *create_source_stream(stream_options &opts);
 
     public:
         virtual bool is_accepted(const model_accept &peer_accept, const update &update) = 0;
+
         virtual bool apply_updates(const update &update) = 0;
-        virtual std::vector<update> history(const sources &peer_sources, const model_accept &accept) = 0;
+
+        virtual std::vector<update>
+        history(const sources &peer_sources, const model_accept &accept) = 0;
 
     protected:
         bool local_update(const std::pair<std::string, nonstd::any> trx);

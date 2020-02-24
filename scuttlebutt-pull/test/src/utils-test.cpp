@@ -40,19 +40,29 @@ TEST(sort, scuttlebutt_pull_utils) {
     std::vector<sb::update> hist{update_1, update_2, update_3, update_4, update_5};
     _sort(hist);
 
-    ASSERT_EQ(std::get<update_items::Timestamp>(update_1), std::get<update_items::Timestamp>(hist.at(0)));
-    ASSERT_EQ(std::get<update_items::SourceId>(update_1), std::get<update_items::SourceId>(hist.at(0)));
+    ASSERT_EQ(std::get<update_items::Timestamp>(update_1),
+              std::get<update_items::Timestamp>(hist.at(0)));
+    ASSERT_EQ(std::get<update_items::SourceId>(update_1),
+              std::get<update_items::SourceId>(hist.at(0)));
 
-    ASSERT_EQ(std::get<update_items::Timestamp>(update_4), std::get<update_items::Timestamp>(hist.at(1)));
-    ASSERT_EQ(std::get<update_items::SourceId>(update_4), std::get<update_items::SourceId>(hist.at(1)));
+    ASSERT_EQ(std::get<update_items::Timestamp>(update_4),
+              std::get<update_items::Timestamp>(hist.at(1)));
+    ASSERT_EQ(std::get<update_items::SourceId>(update_4),
+              std::get<update_items::SourceId>(hist.at(1)));
 
-    ASSERT_EQ(std::get<update_items::Timestamp>(update_2), std::get<update_items::Timestamp>(hist.at(2)));
-    ASSERT_EQ(std::get<update_items::SourceId>(update_2), std::get<update_items::SourceId>(hist.at(2)));
+    ASSERT_EQ(std::get<update_items::Timestamp>(update_2),
+              std::get<update_items::Timestamp>(hist.at(2)));
+    ASSERT_EQ(std::get<update_items::SourceId>(update_2),
+              std::get<update_items::SourceId>(hist.at(2)));
 
-    ASSERT_EQ(std::get<update_items::Timestamp>(update_5), std::get<update_items::Timestamp>(hist.at(3)));
-    ASSERT_EQ(std::get<update_items::SourceId>(update_5), std::get<update_items::SourceId>(hist.at(3)));
+    ASSERT_EQ(std::get<update_items::Timestamp>(update_5),
+              std::get<update_items::Timestamp>(hist.at(3)));
+    ASSERT_EQ(std::get<update_items::SourceId>(update_5),
+              std::get<update_items::SourceId>(hist.at(3)));
 
-    ASSERT_EQ(std::get<update_items::Timestamp>(update_3), std::get<update_items::Timestamp>(hist.at(4)));
-    ASSERT_EQ(std::get<update_items::SourceId>(update_3), std::get<update_items::SourceId>(hist.at(4)));
+    ASSERT_EQ(std::get<update_items::Timestamp>(update_3),
+              std::get<update_items::Timestamp>(hist.at(4)));
+    ASSERT_EQ(std::get<update_items::SourceId>(update_3),
+              std::get<update_items::SourceId>(hist.at(4)));
 }
 

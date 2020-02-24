@@ -31,7 +31,7 @@ namespace sb {
             return update{};
         }
 
-        template <typename ValueType>
+        template<typename ValueType>
         ValueType get_without_clock(const std::string &k) {
             auto it = store_.find(k);
             if (it != store_.end()) {
@@ -48,7 +48,8 @@ namespace sb {
 
         bool apply_updates(const update &u) override;
 
-        std::vector<update> history(const sources &peer_sources, const model_accept &peer_accept) override;
+        std::vector<update>
+        history(const sources &peer_sources, const model_accept &peer_accept) override;
 
     private:
         std::map<std::string, update> store_;
