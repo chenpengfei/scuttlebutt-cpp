@@ -26,11 +26,16 @@ namespace sb {
         accept_ = opts.accept_;
     }
 
-    bool scuttlebutt::_update(update update) {
+    bool scuttlebutt::_update(sb::update update) {
+        auto data_any = std::get<update_items::Data>(update);
+        auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
+        auto key = std::get<model_value_items::Key>(data);
+        auto value = std::get<model_value_items::Value>(data);
         logger->info("_update: [ [{} {}] {} {} ]",
-                std::get<model_value_items::Key>(std::get<sb::update_items::Data>(update)),
-                     nonstd::any_cast<std::string>(std::get<model_value_items::Value>(std::get<sb::update_items::Data>(update))),
-                     std::get<sb::update_items::Timestamp>(update), std::get<sb::update_items::SourceId>(update) );//todo
+                     key,
+                     nonstd::any_cast<std::string>(value),
+                     std::get<sb::update_items::Timestamp>(update),
+                     std::get<sb::update_items::SourceId>(update) );//todo
 
         auto ts = std::get<update_items::Timestamp>(update);
         auto source_id = std::get<update_items::SourceId>(update);

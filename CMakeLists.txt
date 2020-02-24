@@ -26,8 +26,11 @@ if (${GTEST_LATEST})
     enable_testing()
 else()
     set(GTEST googletest-release-1.8.1)
-    include_directories("./include" "${GTEST}/googletest/include/")
-    link_directories("build/gtest/googlemock/gtest/")
+    include_directories(./include
+            ${GTEST}/googletest/include/
+            ${GTEST}/googlemock/include)
+    link_directories(build/gtest/googlemock/gtest/
+            build/gtest/googlemock/)
 endif ()
 
 if (${ENABLE_COVERAGE})

@@ -53,7 +53,7 @@ namespace sb {
                         // counting the update that current stream received
                         ++(self->received_counter_);
                         self->emit("updateReceived", self, u, self->received_counter_,
-                             (self->sb_->id_ + "/" + self->name_));
+                             std::string(self->sb_->id_ + "/" + self->name_));
 
                         if (!self->writable_) { return; }
 
@@ -208,13 +208,6 @@ namespace sb {
             auto payload = buffer_.front();
             buffer_.pop_front();
             callback(false, payload);
-
-            // fire this event when the payload has been read by downstream
-            if (payload.type() == typeid(update)) {
-                // if payload is an update
-                ++sent_counter_;
-                emit("updateSent", this, payload, sent_counter_, (sb_->id_ + "/" + name_));
-            }
         }
     }
 

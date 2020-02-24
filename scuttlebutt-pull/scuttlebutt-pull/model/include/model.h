@@ -10,7 +10,7 @@
 
 namespace sb {
 
-    class model : public scuttlebutt {
+    class model final : public scuttlebutt {
     public:
         model(scuttlebutt_options opts) : scuttlebutt(std::move(opts)) {
 
@@ -36,7 +36,8 @@ namespace sb {
             auto it = store_.find(k);
             if (it != store_.end()) {
                 auto update = nonstd::any_cast<sb::update>(it->second);
-                auto data = std::get<update_items::Data>(update);
+                auto data_any = std::get<update_items::Data>(update);
+                auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
                 auto data_value = std::get<model_value_items::Value>(data);
                 return nonstd::any_cast<ValueType>(data_value);
             }

@@ -68,8 +68,7 @@ namespace sb {
         Singed,
     };
 
-    using update_data = std::pair<std::string, nonstd::any>;
-    using update = std::tuple<update_data, timestamp, source_id, from, singed>;
+    using update = std::tuple<nonstd::any, timestamp, source_id, from, singed>;
     using verify = std::function<bool(const update &)>;
     using sign = std::function<singed(const update &)>;
 
@@ -79,9 +78,9 @@ namespace sb {
 
     class scuttlebutt : public event_emitter {
     public:
-        scuttlebutt(scuttlebutt_options opts);
-
         virtual ~scuttlebutt() {}
+
+        scuttlebutt(scuttlebutt_options opts);
 
         scuttlebutt &set_id(const std::string &id) {
             id_ = id;

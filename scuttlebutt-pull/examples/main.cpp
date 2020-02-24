@@ -22,8 +22,8 @@ int main() {
     model b(scuttlebutt_options("B"));
 
     // in a <-> b relationship, a is read-only and b is write-only
-    auto s1 = a.create_stream(stream_options("a->b"));
-    auto s2 = b.create_stream(stream_options("b->a"));
+    std::unique_ptr<dp::duplex_base> s1(a.create_stream(stream_options("a->b")));
+    std::unique_ptr<dp::duplex_base> s2(b.create_stream(stream_options("b->a")));
 
     a.set("foo", "changed by A");
 
@@ -39,8 +39,8 @@ int main() {
 //        a.set("foo", "changed by A ->" + std::to_string(counter));
 //    }
 
-    delete s1;
-    delete s2;
+    assert(s1);
+    assert(s2);
 
     return 0;
 }

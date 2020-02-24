@@ -18,7 +18,7 @@ TEST(create_id, scuttlebutt_pull_utils) {
 }
 
 TEST(filter, scuttlebutt_pull_utils) {
-    sb::update update_1 = make_tuple(nullptr, 2, "A", "", "");
+    sb::update update_1 = make_tuple(nonstd::any(), 2, "A", "", "");
     sb::sources sources;
 
     ASSERT_TRUE(_filter(update_1, sources));
@@ -31,11 +31,11 @@ TEST(filter, scuttlebutt_pull_utils) {
 }
 
 TEST(sort, scuttlebutt_pull_utils) {
-    sb::update update_1 = make_tuple(nullptr, 1, "A", "", "");
-    sb::update update_2 = make_tuple(nullptr, 2, "B", "", "");
-    sb::update update_3 = make_tuple(nullptr, 3, "C", "", "");
-    sb::update update_4 = make_tuple(nullptr, 2, "A", "", "");
-    sb::update update_5 = make_tuple(nullptr, 2, "C", "", "");
+    sb::update update_1 = make_tuple(nonstd::any(), 1, "A", "", "");
+    sb::update update_2 = make_tuple(nonstd::any(), 2, "B", "", "");
+    sb::update update_3 = make_tuple(nonstd::any(), 3, "C", "", "");
+    sb::update update_4 = make_tuple(nonstd::any(), 2, "A", "", "");
+    sb::update update_5 = make_tuple(nonstd::any(), 2, "C", "", "");
 
     std::vector<sb::update> hist{update_1, update_2, update_3, update_4, update_5};
     _sort(hist);

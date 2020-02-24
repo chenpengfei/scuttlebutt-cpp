@@ -19,11 +19,21 @@ namespace dp {
 
     class duplex_base : public event_emitter {
     public:
+        virtual ~duplex_base() {}
+        
         virtual read &source() = 0;
         virtual sink &sink() = 0;
+
+        virtual std::string name() = 0;
+        virtual bool readable() = 0;
+        virtual void readable(bool value) = 0;
+        virtual bool writable() = 0;
+        virtual void writable(bool value) = 0;
     };
 
     void link(duplex_base *a, duplex_base *b);
+
+    void link(const std::unique_ptr<duplex_base> &a, const std::unique_ptr<duplex_base> &b);
 }
 
 #endif //SCUTTLEBUTT_DUPLEX_PULL_H

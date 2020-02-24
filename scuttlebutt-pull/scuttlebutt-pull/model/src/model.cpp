@@ -9,7 +9,10 @@ namespace sb {
     bool model::is_accepted(const model_accept &peer_accept, const update &u) {
         auto &blacklist = peer_accept.blacklist_;
         auto &whitelist = peer_accept.whitelist_;
-        auto key = std::get<model_value_items::Key>(std::get<update_items::Data>(u));
+
+        auto data_any = std::get<update_items::Data>(u);
+        auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
+        auto key = std::get<model_value_items::Key>(data);
 
         if (!blacklist.empty() && std::find(blacklist.begin(), blacklist.end(), key) != blacklist.end()) {
             return false;
@@ -23,7 +26,9 @@ namespace sb {
     }
 
     bool model::apply_updates(const update &u) {
-        auto key = std::get<model_value_items::Key>(std::get<update_items::Data>(u));
+        auto data_any = std::get<update_items::Data>(u);
+        auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
+        auto key = std::get<model_value_items::Key>(data);
 
         // ignore if we already have a more recent value
         auto it = store_.find(key);
@@ -39,7 +44,7 @@ namespace sb {
         store_[key] = u;
 
         emit("update", u);
-        auto value = std::get<model_value_items::Value>(std::get<update_items::Data>(u));
+        auto value = std::get<model_value_items::Value>(data);
         emit("changed", key, value);
         emit("changed:" + key, value);
 

@@ -24,7 +24,7 @@ namespace sb {
         model_accept accept_;
     };
 
-    class duplex : public dp::duplex_base {
+    class duplex final : public dp::duplex_base {
     public:
         duplex(scuttlebutt *sb, const stream_options &opts)
                 : sb_(sb), writable_(opts.writable_), readable_(opts.readable_),
@@ -101,6 +101,13 @@ namespace sb {
             cb_ = nullptr;
             if (cb) {
                 cb(end, data);
+
+                // fire this event when the payload has been read by downstream
+                if (data.type() == typeid(sb::update)) {
+                    // if payload is an update
+                    ++sent_counter_;
+                    emit("updateSent", this, data, sent_counter_, std::string(sb_->id_ + "/" + name_));
+                }
             }
         }
 
@@ -173,23 +180,24 @@ namespace sb {
 
         void start(const outgoing &incoming);
 
-        std::string name() {
+    public:
+        std::string name() override {
             return name_;
         }
 
-        bool readable() {
+        bool readable() override {
             return readable_;
         }
 
-        void readable(bool value) {
+        void readable(bool value) override {
             readable_ = value;
         }
 
-        bool writable() {
+        bool writable() override {
             return writable_;
         }
 
-        void writable(bool value) {
+        void writable(bool value) override {
             writable_ = value;
         }
 

@@ -11,4 +11,9 @@ namespace dp {
         pull(a->source(), b->sink());
         pull(b->source(), a->sink());
     }
+
+    void link(const std::unique_ptr<duplex_base> &a, const std::unique_ptr<duplex_base> &b) {
+        pull(a->source(), b->sink());
+        pull(b->source(), a->sink());
+    }
 }
