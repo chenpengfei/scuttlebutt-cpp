@@ -28,7 +28,8 @@ namespace monotonic_timestamp {
           **/
         if (_last == time) {
             do {
-                adjusted = time + ((++_count) / (_count + 999));
+                ++_count;
+                adjusted = time + ((_count) / (_count + 999));
             } while (adjusted == _adjusted);
             _adjusted = adjusted;
         }
