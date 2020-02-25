@@ -10,7 +10,7 @@ add_executable(${PROJECT_NAME} ${INCLUDES} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} gtest gtest_main event-emitter)
 
 if (${ENABLE_COVERAGE})
-  target_link_libraries(${PROJECT_NAME} -fprofile-arcs -ftest-coverage)
+    target_link_libraries(${PROJECT_NAME} -fprofile-arcs -ftest-coverage)
 endif ()
 
 add_test(unit-test-event-emitter ${PROJECT_NAME})

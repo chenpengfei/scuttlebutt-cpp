@@ -23,6 +23,10 @@ struct any_callable {
         (nonstd::any_cast<std::function<void(Args...)>>(callable_))(std::forward<Args>(args)...);
     }
 
+    bool operator==(const any_callable &cb) {
+        return ((this->once_ == cb.once_) && (this->address_ == cb.address_));
+    }
+
     nonstd::any callable_;
     bool once_;
     size_t address_;
@@ -41,19 +45,18 @@ public:
      */
     template<class... Args>
     bool emit(const std::string &event_name, Args &&... args) {
-        auto cbs_it = listeners_.find(event_name);
+        auto copy = listeners(event_name);
 
-        if (cbs_it == listeners_.end()) {
+        if (copy.empty()) {
             return false;
         }
 
-        for (auto it = cbs_it->second.begin(); it != cbs_it->second.end();) {
-            it->operator()(std::forward<Args>(args)...);
-            if (!it->once_) {
-                ++it;
-            } else {
-                it = cbs_it->second.erase(it);
+        for (auto it = copy.begin(); it != copy.end(); ++it) {
+            if (it->once_) {
+                auto success = remove_listener(event_name, *it);
+                assert(success);
             }
+            it->operator()(std::forward<Args>(args)...);
         }
 
         return true;
@@ -79,24 +82,29 @@ public:
      * The next time eventName is triggered, this listener is removed and then invoked.
      */
     template<typename ... Args>
-    event_emitter &once(const std::string &event_name, const std::function<void(Args...)> &listener) {
+    event_emitter &
+    once(const std::string &event_name, const std::function<void(Args...)> &listener) {
         add_listener(event_name, listener, true);
         return *this;
     }
 
     /**
-     * Removes the specified listener from the listener array for the event named eventName.
-     * removeListener() will remove, at most, one instance of a listener from the listener array.
+     * Removes the specified listener from the listener array for the event named event_name.
+     * remove_listener() will remove, at most, one instance of a listener from the listener array.
      * If any single listener has been added multiple times to the listener array for the specified eventName,
-     * then removeListener() must be called multiple times to remove each instance.
+     * then remove_listener() must be called multiple times to remove each instance.
+     *
+     * When a single function has been added as a handler multiple times for a single event (as in the example below),
+     * remove_listener() will remove the most recently added instance
      */
     template<typename ... Args>
-    event_emitter &remove_listener(const std::string &event_name, const std::function<void(Args...)> &listener) {
+    event_emitter &
+    remove_listener(const std::string &event_name, const std::function<void(Args...)> &listener) {
         auto cbs_it = listeners_.find(event_name);
         if (cbs_it != listeners_.end()) {
-            for (auto it = cbs_it->second.begin(); it != cbs_it->second.end(); ++it) {
-                if (it->address_ == (size_t)(&listener)) {
-                    cbs_it->second.erase(it);
+            for (auto ri = cbs_it->second.rbegin(); ri != cbs_it->second.rend(); ++ri) {
+                if (ri->address_ == (size_t) (&listener)) {
+                    cbs_it->second.erase(std::next(ri).base());
                     break;
                 }
             }
@@ -126,10 +134,26 @@ public:
         }
     }
 
+    /**
+     * Returns a copy of the array of listeners for the event named event_name
+     * @param event_name
+     * @return
+     */
+    std::vector<any_callable> listeners(const std::string &event_name) {
+        auto cbs_it = listeners_.find(event_name);
+
+        if (cbs_it == listeners_.end()) {
+            return std::vector<any_callable>();
+        }
+
+        return cbs_it->second;
+    }
+
 private:
     template<typename ... Args>
-    void add_listener(const std::string& event_name, const std::function<void(Args...)> &listener, bool once = false) {
-        auto it = listeners_.find(event_name);
+    void add_listener(const std::string &event_name, const std::function<void(Args...)> &listener,
+                      bool once = false) {
+        decltype(auto) it = listeners_.find(event_name);
         if (it == listeners_.end()) {
             std::vector<any_callable> vec;
             vec.emplace_back(listener, once);
@@ -138,6 +162,24 @@ private:
             it->second.emplace_back(listener, once);
         }
     }
+
+    /**
+     * Removes the specified listener from the listener array for the event named event_name.
+     * remove_listener() will remove, at most, one instance of a listener from the listener array.
+     */
+    bool remove_listener(const std::string &event_name, const any_callable &cb) {
+        auto cbs_it = listeners_.find(event_name);
+        if (cbs_it != listeners_.end()) {
+            for (auto it = cbs_it->second.begin(); it != cbs_it->second.end(); ++it) {
+                if (*it == cb) {
+                    cbs_it->second.erase(it);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
 private:
     std::map<std::string, std::vector<any_callable>> listeners_;
