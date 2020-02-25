@@ -41,18 +41,18 @@ namespace sb {
             sync_sent_ = !readable_;
 
             ++sb->streams;
-            once("dispose", get_on_end());
+            sb_->once("dispose", get_on_end());
 
-            on_close_ = [this](bool) {
+            on_close_ = std::function<void(bool)>([this](bool) {
                 sb_->remove_listener("_update", get_on_update());
                 sb_->remove_listener("dispose", get_on_end());
                 --(sb_->streams);
                 sb_->emit("unstream", sb_->streams);
-            };
+            });
         }
 
-        void end(bool end = true) {
-            get_on_end()(end);
+        void end() override {
+            get_on_end()();
         }
 
         dp::read &source() override {
@@ -78,10 +78,10 @@ namespace sb {
         }
 
     private:
-        std::function<void(bool)> &get_on_end() {
+        std::function<void()> &get_on_end() {
             if (on_end_ == nullptr) {
-                on_end_ = [this](bool end) {
-                    ended_ = end;
+                on_end_ = [this]() {
+                    ended_ = true;
                     // attempt to drain
                     drain();
                 };
@@ -204,7 +204,7 @@ namespace sb {
         }
 
     private:
-        std::function<void(bool end)> on_end_ = nullptr;
+        std::function<void()> on_end_ = nullptr;
         std::function<void(sb::update &update)> on_update_ = nullptr;
         dp::read raw_source_ = nullptr;
         dp::sink raw_sink_ = nullptr;

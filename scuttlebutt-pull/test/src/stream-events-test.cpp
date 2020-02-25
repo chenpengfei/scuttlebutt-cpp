@@ -3,15 +3,15 @@
 //
 
 #include <typeinfo>
+#include "gtest/gtest.h"
 #include "duplex-pull/include/duplex-pull.h"
 #include "model.h"
 #include "event_listener.h"
-#include "gtest/gtest.h"
 
 using namespace std;
 using namespace sb;
 
-TEST(end_one_stream, stream) {
+TEST(update_sent_received_event, stream) {
     model a(scuttlebutt_options("A"));
     model b(scuttlebutt_options("B"));
 

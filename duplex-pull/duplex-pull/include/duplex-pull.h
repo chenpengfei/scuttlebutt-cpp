@@ -29,6 +29,8 @@ namespace dp {
         virtual void readable(bool value) = 0;
         virtual bool writable() = 0;
         virtual void writable(bool value) = 0;
+
+        virtual void end() = 0;
     };
 
     void link(duplex_base *a, duplex_base *b);

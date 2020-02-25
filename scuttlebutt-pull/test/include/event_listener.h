@@ -10,9 +10,11 @@
 
 using update_sent_listener = std::function<void(dp::duplex_base *duplex, const nonstd::any &update,
                                                 int &sent_counter, std::string id_name)>;
-//using update_received_listener = std::function<void(dp::duplex_base * duplex, const nonstd::any & update, int &sent_counter, std::string id_name)>;
+
 using update_received_listener = std::function<void(dp::duplex_base *duplex,
                                                     const nonstd::any &update,
                                                     int &sent_counter, std::string id_name)>;
+
+using unstream_listener = std::function<void(int &count)>;
 
 #endif //SCUTTLEBUTT_EVENT_LISTENER_H

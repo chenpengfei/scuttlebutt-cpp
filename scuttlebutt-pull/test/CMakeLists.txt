@@ -5,6 +5,7 @@ include_directories(./include
 include_directories(${gtest_SOURCE_DIR}/include)
 
 set(SOURCE_FILES
+        src/stream-end-test.cpp
         src/stream-events-test.cpp
         src/utils-test.cpp)
 

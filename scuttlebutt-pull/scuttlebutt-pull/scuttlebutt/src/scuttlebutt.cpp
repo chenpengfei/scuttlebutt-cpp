@@ -87,7 +87,7 @@ namespace sb {
         return _update(std::make_tuple(trx, monotonic_timestamp::timestamp(), id_, "", ""));
     }
 
-    dp::duplex_base *scuttlebutt::create_stream(const stream_options &opts) {
+    dp::duplex_base *scuttlebutt::create_stream(const stream_options &opts = stream_options{}) {
         return new duplex(this, opts);
     }
 

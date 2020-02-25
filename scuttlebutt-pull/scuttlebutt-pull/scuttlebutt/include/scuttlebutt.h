@@ -37,6 +37,7 @@ namespace sb {
     };
 
     struct scuttlebutt_options {
+        scuttlebutt_options() = default;
         scuttlebutt_options(std::string id) : id_(id) {}
 
         source_id id_ = "";
@@ -48,6 +49,7 @@ namespace sb {
     };
 
     struct stream_options {
+        stream_options() = default;
         stream_options(std::string name) : name_(name) {}
 
         bool readable_ = true;
@@ -82,7 +84,7 @@ namespace sb {
     public:
         virtual ~scuttlebutt() {}
 
-        scuttlebutt(scuttlebutt_options opts);
+        explicit scuttlebutt(scuttlebutt_options opts);
 
         scuttlebutt &set_id(const std::string &id) {
             id_ = id;

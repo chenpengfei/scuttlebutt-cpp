@@ -43,7 +43,7 @@ namespace sb {
                 self->peer_next_ = [self](bool end, const nonstd::any &u) {
                     if (end) {
                         self->logger->info("sink ended by peer({}), {}", self->peer_id_, end);
-                        self->end(end);
+                        self->end();
                         return;
                     }
 
@@ -193,7 +193,7 @@ namespace sb {
             // there is no downstream waiting for callback
             if (ended_ && on_close_) {
                 // perform _onclose regardless of whether there is data in the cache
-                auto c(on_close_);
+                auto c = on_close_;
                 on_close_ = nullptr;
                 c(ended_);
             }

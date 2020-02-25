@@ -12,7 +12,7 @@ namespace sb {
 
     class model final : public scuttlebutt {
     public:
-        model(scuttlebutt_options opts) : scuttlebutt(std::move(opts)) {
+        explicit model(scuttlebutt_options opts = scuttlebutt_options{}) : scuttlebutt(std::move(opts)) {
 
         }
 
