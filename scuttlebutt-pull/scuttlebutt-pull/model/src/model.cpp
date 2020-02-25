@@ -27,7 +27,7 @@ namespace sb {
         return true;
     }
 
-    bool model::apply_updates(const update &u) {
+    bool model::apply_updates(const sb::update &u) {
         auto data_any = std::get<update_items::Data>(u);
         auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
         auto key = std::get<model_value_items::Key>(data);

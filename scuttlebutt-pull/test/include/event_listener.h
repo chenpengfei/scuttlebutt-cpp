@@ -17,4 +17,10 @@ using update_received_listener = std::function<void(dp::duplex_base *duplex,
 
 using unstream_listener = std::function<void(int &count)>;
 
+using changed_with_kv_listener = std::function<void(std::string &key, nonstd::any &value)>;
+using changed_with_v_listener = std::function<void(nonstd::any &value)>;
+
+using changed_by_peer_listener = std::function<void(std::string &key, nonstd::any &value,
+                                                    const sb::from &from)>;
+
 #endif //SCUTTLEBUTT_EVENT_LISTENER_H

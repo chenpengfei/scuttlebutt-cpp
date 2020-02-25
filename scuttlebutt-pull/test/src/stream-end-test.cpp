@@ -40,10 +40,10 @@ TEST(stream_count_when_end, stream) {
 
     link(s1, s2);
 
-    a.on("unstream", unstream_listener([](int &count){
+    a.on("unstream", unstream_listener([](int &count) {
         ASSERT_EQ(0, count);
     }));
-    b.on("unstream", unstream_listener([](int &count){
+    b.on("unstream", unstream_listener([](int &count) {
         ASSERT_EQ(0, count);
     }));
     s1->end();
@@ -58,7 +58,7 @@ TEST(stream_count_when_dispose, stream) {
     ASSERT_EQ(2, a.streams);
 
     int counter = 2;
-    a.on("unstream", unstream_listener([&](int &count){
+    a.on("unstream", unstream_listener([&](int &count) {
         --counter;
     }));
 

@@ -28,7 +28,7 @@ TEST(whitelist_filter_out_in_history, model_filter) {
     a.set(expected.key, expected.valueA);
     a.set(ignored.key, expected.valueA);
 
-    s2->on("synced", std::function<void()>([&](){
+    s2->on("synced", std::function<void()>([&]() {
         ASSERT_EQ(expected.valueA, b.get_without_clock<std::string>(expected.key));
         ASSERT_EQ("", b.get_without_clock<std::string>(ignored.key));
     }));
