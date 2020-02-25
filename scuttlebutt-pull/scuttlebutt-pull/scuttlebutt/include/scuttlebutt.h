@@ -37,8 +37,10 @@ namespace sb {
     };
 
     struct scuttlebutt_options {
-        scuttlebutt_options() = default;
-        scuttlebutt_options(std::string id) : id_(id) {}
+        scuttlebutt_options(std::string id = "") : id_(id) {}
+
+        scuttlebutt_options(std::string id, model_accept accept)
+                : id_(id), accept_(accept) {}
 
         source_id id_ = "";
         create_id create_id_ = nullptr;
@@ -49,8 +51,7 @@ namespace sb {
     };
 
     struct stream_options {
-        stream_options() = default;
-        stream_options(std::string name) : name_(name) {}
+        stream_options(std::string name = "") : name_(name) {}
 
         bool readable_ = true;
         bool writable_ = true;
