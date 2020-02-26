@@ -11,7 +11,8 @@ TEST(without_stackoverflow, pull_looper) {
     float n = N, c = 0;
     const clock_t begin_time = clock();
 
-    std::function<void()> next = pull::looper(std::function<void()>([&]() {
+    pull::looper looper;
+    std::function<void()> next = looper(std::function<void()>([&]() {
         c++;
         if (--n > 0) { return next(); }
         auto ms = float(clock() - begin_time) / (CLOCKS_PER_SEC / 1000);

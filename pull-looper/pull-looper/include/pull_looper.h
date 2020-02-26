@@ -9,7 +9,16 @@
 
 namespace pull {
 
-    std::function<void()> looper(std::function<void()> f);
+    class looper {
+    public:
+        virtual ~looper() {}
+
+        std::function<void()> operator()(std::function<void()>);
+
+    private:
+        bool active = false;
+        bool called = false;
+    };
 }
 
 #endif //SCUTTLEBUTT_PULL_LOOPER_H

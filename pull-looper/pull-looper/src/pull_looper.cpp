@@ -6,9 +6,8 @@
 
 namespace pull {
 
-    std::function<void()> looper(std::function<void()> f) {
-        bool active = false, called = false;
-        return [&]() {
+    std::function<void()> looper::operator()(std::function<void()> f) {
+        return [this, f]() {
             called = true;
             if (!active) {
                 active = true;
