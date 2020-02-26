@@ -10,68 +10,71 @@
 #include <utility>
 #include "spdlog/spdlog.h"
 
-template<typename T, typename R>
-decltype(auto) log_with_recursive(R &&read) {
+namespace pull {
 
-    std::function<void(bool, T)> more = [&](bool done, T val) {
-        if (!done) {
-            spdlog::info(val);
-            read(false, more);
-        }
-    };
+    template<typename T, typename R>
+    decltype(auto) log_with_recursive(R &&read) {
 
-    read(false, more);
-}
+        std::function<void(bool, T)> more = [&](bool done, T val) {
+            if (!done) {
+                spdlog::info(val);
+                read(false, more);
+            }
+        };
+
+        read(false, more);
+    }
 
 // https://en.cppreference.com/w/cpp/thread/condition_variable
 // https://www.modernescpp.com/index.php/c-core-guidelines-be-aware-of-the-traps-of-condition-variables
-template<typename T, typename R>
-decltype(auto) log_with_condition_variable(R &&read) {
-    std::mutex m;
-    std::condition_variable cv;
-    bool ready = false;
-    bool ended = false;
+    template<typename T, typename R>
+    decltype(auto) log_with_condition_variable(R &&read) {
+        std::mutex m;
+        std::condition_variable cv;
+        bool ready = false;
+        bool ended = false;
 
-    do {
-        read(false, [&read, &ended, &ready, &m, &cv](bool done, T val) {
-            ended = done;
-            if (!ended) {
-                spdlog::info(val);
-            }
+        do {
+            read(false, [&read, &ended, &ready, &m, &cv](bool done, T val) {
+                ended = done;
+                if (!ended) {
+                    spdlog::info(val);
+                }
 
-            {
-                std::lock_guard<std::mutex> lk(m);
-                ready = true;
-            }
-            cv.notify_one();
-        });
+                {
+                    std::lock_guard<std::mutex> lk(m);
+                    ready = true;
+                }
+                cv.notify_one();
+            });
 
-        std::unique_lock<std::mutex> lk(m);
-        cv.wait(lk, [&ready]{return ready;});
-        ready = false;
-    } while(!ended);
-}
+            std::unique_lock<std::mutex> lk(m);
+            cv.wait(lk, [&ready] { return ready; });
+            ready = false;
+        } while (!ended);
+    }
 
 // https://www.modernescpp.com/index.php/thread-synchronization-with-condition-variables-or-tasks
-template<typename T, typename R>
-decltype(auto) log_with_promise(R &&read) {
-    bool ended = false;
+    template<typename T, typename R>
+    decltype(auto) log_with_promise(R &&read) {
+        bool ended = false;
 
-    do {
-        std::promise<void> prom;
-        auto fut= prom.get_future();
+        do {
+            std::promise<void> prom;
+            auto fut = prom.get_future();
 
-        read(false, [&read, &ended, &prom](bool done, T val) {
-            ended = done;
-            if (!ended) {
-                spdlog::info(val);
-            }
+            read(false, [&read, &ended, &prom](bool done, T val) {
+                ended = done;
+                if (!ended) {
+                    spdlog::info(val);
+                }
 
-            prom.set_value();
-        });
+                prom.set_value();
+            });
 
-        fut.wait();
-    } while(!ended);
+            fut.wait();
+        } while (!ended);
+    }
 }
 
 #endif //SCUTTLEBUTT_SINK_H

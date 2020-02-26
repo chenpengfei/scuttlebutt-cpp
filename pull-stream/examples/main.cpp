@@ -9,72 +9,36 @@
 #include <values.h>
 #include <map.h>
 #include "spdlog/spdlog.h"
+#include "pull-looper/include/pull_looper.h"
 
 using namespace std;
 
-void test_pull_stream_with_promise() {
-    int n = 5;
-    vector<int> vec;
-    vec.reserve(n);
-    for (auto i = 1; i < n; ++i) {
-        vec.push_back(i);
-    }
+template<typename T, typename R>
+decltype(auto) log_with_looper(R &&read) {
+    std::function<void()> next = pull::looper(std::function<void()>([&]() {
+        read(false, [&](bool done, T val) {
+            if (!done) {
+                spdlog::info(val);
+                next();
+            }
+        });
+    }));
 
-    auto begin = vec.begin();
-    auto end = vec.end();
-    auto vals = values(begin, end);
-    auto mapper = [&](int val){return val * 2;};
-    auto timesTwo = Map<int>(mapper);
-    auto timesFour = pipe_through(timesTwo, timesTwo);
-    auto logInt = [&] (auto read) { log_with_promise<int>(read); };
-
-    auto newVals = pull(vals, timesTwo, timesFour);
-
-    const clock_t begin_time = clock();
-
-    pull(vals, timesTwo, logInt);
-
-    spdlog::info("test_pull_stream_with_promise cost: {}ms",
-            float( clock () - begin_time ) /  (CLOCKS_PER_SEC/1000));
-
-}
-
-void test_pull_stream_with_condition_variable() {
-    int n = 5;
-    vector<int> vec;
-    vec.reserve(n);
-    for (auto i = 1; i < n; ++i) {
-        vec.push_back(i);
-    }
-
-    auto begin = vec.begin();
-    auto end = vec.end();
-    auto vals = values(begin, end);
-    auto mapper = [&](int val){return val * 2;};
-    auto timesTwo = Map<int>(mapper);
-    auto timesFour = pipe_through(timesTwo, timesTwo);
-    auto logInt = [&] (auto read) { log_with_condition_variable<int>(read); };
-
-    auto newVals = pull(vals, timesTwo, timesFour);
-    auto newLogInt = pipe_through(timesTwo, timesTwo, timesFour, logInt);
-
-    const clock_t begin_time = clock();
-
-    pull(newVals,
-            timesTwo,
-            pipe_through(timesTwo, timesTwo),
-            timesFour,
-            timesTwo,
-            newLogInt);
-
-    spdlog::info("test_pull_stream_with_condition_variable cost: {}ms",
-                 float( clock () - begin_time ) /  (CLOCKS_PER_SEC/1000));
+    next();
 }
 
 int main() {
-    test_pull_stream_with_promise();
+    int n = 500000;
+    auto source = pull::values(n);
 
-    test_pull_stream_with_condition_variable();
+    auto log_int = [&](auto read) { log_with_looper<int>(read); };
+//    auto log_int = [&](auto read) { pull::log_with_promise<int>(read); };
+
+    const clock_t begin_time = clock();
+    log_int(source);
+    auto ms = float(clock() - begin_time) / (CLOCKS_PER_SEC / 1000);
+    spdlog::info("time for 1m loop, {}ms", ms);
+
 
     return 0;
 }

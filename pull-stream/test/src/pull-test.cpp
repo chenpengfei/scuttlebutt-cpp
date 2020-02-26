@@ -14,6 +14,7 @@
 #include <map.h>
 
 using namespace std;
+using namespace pull;
 
 TEST(combinesSourceWithThrough, pull) {
 
@@ -25,13 +26,13 @@ TEST(combinesSourceWithThrough, pull) {
 
     auto vals = values(begin, end);
 
-    auto mapper = [&](int val){return val * 2;};
+    auto mapper = [&](int val) { return val * 2; };
     auto timesTwo = Map<int>(mapper);
     auto timesFour = pipe_through(timesTwo, timesTwo);
 
-    auto newVals = pull(pull(vals, timesTwo), timesTwo, timesFour);
+    auto newVals = pull::pull(pull::pull(vals, timesTwo), timesTwo, timesFour);
 
-    newVals(false, [](bool done, auto val){
+    newVals(false, [](bool done, auto val) {
         ASSERT_EQ(val, 16);
         ASSERT_FALSE(done);
     });

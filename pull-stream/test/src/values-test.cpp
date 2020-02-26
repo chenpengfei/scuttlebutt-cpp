@@ -11,6 +11,7 @@
 #include <map.h>
 
 using namespace std;
+using namespace pull;
 
 TEST(returnsSourceWhenNumArgsIsOne, pull) {
     vector<int> vec;
@@ -21,9 +22,9 @@ TEST(returnsSourceWhenNumArgsIsOne, pull) {
 
     auto vals = values(begin, end);
 
-    auto newVals = pull(vals);
+    auto newVals = pull::pull(vals);
 
-    vals(false, [](bool done, auto val){
+    vals(false, [](bool done, auto val) {
         ASSERT_EQ(val, 1);
         ASSERT_FALSE(done);
     });
@@ -40,17 +41,17 @@ TEST(CanCallValues, values) {
 
     auto vals = values(begin, end);
 
-    vals(false, [](bool done, auto val){
+    vals(false, [](bool done, auto val) {
         ASSERT_EQ(val, 1);
         ASSERT_FALSE(done);
     });
 
-    vals(false, [](bool done, auto val){
+    vals(false, [](bool done, auto val) {
         ASSERT_EQ(val, 2);
         ASSERT_FALSE(done);
     });
 
-    vals(false, [](bool done, auto val){
+    vals(false, [](bool done, auto val) {
         ASSERT_TRUE(done);
     });
 }
@@ -62,22 +63,22 @@ TEST(CanMapValues, Map) {
     auto begin = vec.begin(); //these are on the stack and are destroyed when the function ends.
     auto end = vec.end();
     auto vals = values(begin, end);
-    auto mapper = [&](int val){return val * 2;};
+    auto mapper = [&](int val) { return val * 2; };
 
     auto timesTwo = Map<int>(mapper);
     auto doubled = timesTwo(vals);
 
-    doubled(false, [](bool done, auto val){
+    doubled(false, [](bool done, auto val) {
         ASSERT_EQ(val, 2);
         ASSERT_FALSE(done);
     });
 
-    doubled(false, [](bool done, auto val){
+    doubled(false, [](bool done, auto val) {
         ASSERT_EQ(val, 4);
         ASSERT_FALSE(done);
     });
 
-    doubled(false, [](bool done, auto val){
+    doubled(false, [](bool done, auto val) {
         ASSERT_TRUE(done);
     });
 }

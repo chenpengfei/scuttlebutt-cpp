@@ -5,20 +5,23 @@
 #ifndef SCUTTLEBUTT_THROUGH_H
 #define SCUTTLEBUTT_THROUGH_H
 
-template<typename T, typename M>
-decltype(auto) Map(M &&mapper) {
+namespace pull {
 
-    return [&mapper](auto &&read) {
-        return [read, &mapper](bool abort, auto cb) {
-            read(abort, [&](bool end, T val) {
-                bool ended = abort || end;
-                if (ended)
-                    cb(true, val);
-                else
-                    cb(false, mapper(val));
-            });
+    template<typename T, typename M>
+    decltype(auto) Map(M &&mapper) {
+
+        return [&mapper](auto &&read) {
+            return [read, &mapper](bool abort, auto cb) {
+                read(abort, [&](bool end, T val) {
+                    bool ended = abort || end;
+                    if (ended)
+                        cb(true, val);
+                    else
+                        cb(false, mapper(val));
+                });
+            };
         };
-    };
+    }
 }
 
 #endif //SCUTTLEBUTT_THROUGH_H

@@ -5,17 +5,33 @@
 #ifndef SCUTTLEBUTT_SOURCE_H
 #define SCUTTLEBUTT_SOURCE_H
 
-template<typename T>
-decltype(auto) values(T &begin, T &end) {
+namespace pull {
 
-    return [&begin, &end](bool abort, auto cb) {
+    template<typename T>
+    decltype(auto) values(T &begin, T &end) {
 
-        if (abort || (begin == end)) {
-            cb(true, -1);
-        } else {
-            cb(false, *begin++);
-        }
-    };
+        return [&begin, &end](bool abort, auto cb) {
+
+            if (abort || (begin == end)) {
+                cb(true, -1);
+            } else {
+                cb(false, *begin++);
+            }
+        };
+    }
+
+    template <typename T>
+    decltype(auto) values(T &value) {
+
+        return [&value](bool abort, auto cb) {
+
+            if (abort || (value <= 0)) {
+                cb(true, -1);
+            } else {
+                cb(false, value--);
+            }
+        };
+    }
 }
 
 #endif //SCUTTLEBUTT_SOURCE_H
