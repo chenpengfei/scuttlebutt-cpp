@@ -4,6 +4,7 @@
 
 #include <utility>
 #include <scuttlebutt-pull/duplex/include/duplex.h>
+#include "pull-looper/include//pull_looper.h"
 
 namespace sb {
 
@@ -24,8 +25,9 @@ namespace sb {
                     auto outgoing = self->get_outgoing();
                     self->push(outgoing, true);
                     self->logger->info("sent 'outgoing': {} [{} {}]",
-                                       outgoing.id_, outgoing.clock_.begin()->first,
-                                       outgoing.clock_.begin()->second);//todo.outgoing
+                                       outgoing.id_,
+                                       outgoing.clock_.empty()? "" : outgoing.clock_.begin()->first,
+                                       outgoing.clock_.empty()? 0.0 : outgoing.clock_.begin()->second);//todo.outgoing
                 }
 
                 self->cb_ = std::move(cb);
@@ -38,31 +40,38 @@ namespace sb {
     dp::sink &duplex::get_raw_sink() {
         if (!raw_sink_) {
             decltype(auto) self = this;
+
+//            looper_ = std::function<std::function<void()>(std::function<void()>)>(pull::looper);
             raw_sink_ = [self](dp::read read) {
                 self->peer_read_ = std::move(read);
-                self->peer_next_ = [self](bool end, const nonstd::any &u) {
+                self->more_ = [self](bool end, const nonstd::any &u) {
                     if (end) {
-                        self->logger->info("sink ended by peer({}), {}", self->peer_id_, end);
+                        self->logger->info("sink ended by peer({}), {}",
+                                           self->peer_id_, end);
                         self->end();
                         return;
                     }
 
                     if (u.type() == typeid(sb::update)) {
-                        self->logger->info("sink reads data from peer({}): {}", self->peer_id_,
+                        self->logger->info("sink reads data from peer({}): {}",
+                                           self->peer_id_,
                                            "update");//todo
 
                         // counting the update that current stream received
                         ++(self->received_counter_);
-                        self->emit("updateReceived", (dp::duplex_base *) self, u,
+                        self->emit("updateReceived", (dp::duplex_base *) self,
+                                   u,
                                    self->received_counter_,
-                                   std::string(self->sb_->id_ + "/" + self->name_));
+                                   std::string(self->sb_->id_ + "/" +
+                                               self->name_));
 
                         if (!self->writable_) { return; }
 
                         self->sb_->_update(nonstd::any_cast<sb::update>(u));
                     } else if (u.type() == typeid(std::string)) {
                         self->logger->info("sink reads data from peer({}): {}",
-                                           self->peer_id_, nonstd::any_cast<std::string>(u));//todo
+                                           self->peer_id_,
+                                           nonstd::any_cast<std::string>(u));//todo
 
                         auto cmd = nonstd::any_cast<std::string>(u);
                         if (cmd == "SYNC") {
@@ -82,9 +91,10 @@ namespace sb {
                         }
                     } else {
                         outgoing o = nonstd::any_cast<outgoing>(u);
-                        self->logger->info("sink reads data from peer({}): {} [{} {}]",
-                                           self->peer_id_, o.id_, o.clock_.begin()->first,
-                                           o.clock_.begin()->second);//todo
+                        self->logger->info("sink reads data from peer({}): [{} {}]",
+                                           o.clock_.empty()? "" : o.clock_.begin()->first ,
+                                           o.clock_.empty()? "" : o.clock_.begin()->first,
+                                           o.clock_.empty()? 0.0 : o.clock_.begin()->second);//todo
 
                         if (self->readable_) {
                             // it's a scuttlebutt digest(vector clocks)
@@ -96,97 +106,18 @@ namespace sb {
                                     self->peer_id_);
                         }
                     }
-
-                    self->peer_read_(self->abort_ || self->ended_, self->peer_next_);
+                    self->looper_next_();
                 };
 
-                self->peer_read_(self->abort_ || self->ended_, self->peer_next_);
+                self->looper_next_ = self->looper_(std::function<void()>([self]() {
+                    self->peer_read_(self->abort_ || self->ended_, self->more_);
+                }));
+
+                self->looper_next_();
             };
+            return raw_sink_;
         }
-        return raw_sink_;
     }
-
-//    template<typename T, typename R>
-//    decltype(auto) log_with_recursive(R &&read) {
-//
-//        std::function<void(bool, T)> more = [&](bool done, T val) {
-//            if (!done) {
-//                spdlog::info(val);
-//                read(false, more);
-//            }
-//        };
-//
-//        read(false, more);
-//    }
-
-//    dp::sink &duplex::get_raw_sink() {
-//        if (!raw_sink_) {
-//            raw_sink_ = [this](dp::read read){
-//                bool _ended = false;
-//
-//                do {
-//                    std::promise<void> prom;
-//                    auto fut= prom.get_future();
-//
-//                    read(abort_ || ended_, [this, &read, &_ended, &prom](bool end, const nonstd::any &u) {
-//                        _ended = end;
-//
-//                        if (end) {
-//                            logger->info("sink ended by peer({}), {}", peer_id_, end);
-//                            this->end(end);
-//                            return;
-//                        }
-//
-//                        logger->info("sink reads data from peer({}): {}",
-//                                     !peer_id_.empty()? peer_id_: nonstd::any_cast<outgoing>(u).id_, "update");//todo
-//
-//                        if (u.type() == typeid(sb::update)) {
-//                            // counting the update that current stream received
-//                            ++received_counter_;
-//                            emit("updateReceived", this, u, received_counter_, (sb_->id_ + "/" + name_));
-//
-//                            if (!writable_) { return; }
-//
-//                            sb_->_update(nonstd::any_cast<sb::update>(u));
-//                        } else if (u.type() == typeid(std::string)) {
-//                            auto cmd = nonstd::any_cast<std::string>(u);
-//                            if (cmd == "SYNC") {
-//                                if (writable_) {
-//                                    logger->info("SYNC received");
-//                                    sync_recv_ = true;
-//                                    emit("syncReceived");
-//                                    if (sync_sent_) {
-//                                        logger->info("emit synced");
-//                                        emit("synced");
-//                                    }
-//                                } else {
-//                                    logger->info("ignore peer's({}}) SYNC due to our non-writable setting", peer_id_);
-//                                }
-//                            }
-//                        } else {
-//                            outgoing o = nonstd::any_cast<outgoing>(u);
-//                            logger->info("sink reads data from peer({}): {} [{} {}]",
-//                                         peer_id_, o.id_, o.clock_.begin()->first,o.clock_.begin()->second);//todo
-//
-//                            if (readable_) {
-//                                // it's a scuttlebutt digest(vector clocks)
-//                                start(o);
-//                            } else {
-//                                peer_id_ = o.id_;
-//                                logger->info("ignore peer's({}}) outgoing data due to our non-readable setting", peer_id_);
-//                            }
-//                        }
-//
-//                        prom.set_value();
-//                    });
-//
-//                    fut.wait();
-//                } while(!_ended);
-//
-//            };
-//        }
-//        return raw_sink_;
-//    }
 
     void duplex::drain() {
         if (!cb_) {
@@ -215,8 +146,9 @@ namespace sb {
 
     void duplex::start(const outgoing &incoming) {
         logger->info("start with data: {} [{} {}]",
-                     incoming.id_, incoming.clock_.begin()->first,
-                     incoming.clock_.begin()->second);//todo
+                     incoming.id_,
+                     incoming.clock_.empty()? "" : incoming.clock_.begin()->first,
+                     incoming.clock_.empty()? 0.0 : incoming.clock_.begin()->second);//todo
 
         peer_sources_ = incoming.clock_;
         peer_id_ = incoming.id_;

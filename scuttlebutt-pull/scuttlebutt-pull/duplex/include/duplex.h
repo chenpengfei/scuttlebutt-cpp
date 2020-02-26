@@ -12,6 +12,7 @@
 #include <utility>
 #include "event-emitter/include/event_emitter.h"
 #include "scuttlebutt.h"
+#include "pull-looper/include/pull_looper.h"
 
 namespace sb {
 
@@ -24,7 +25,7 @@ namespace sb {
         model_accept accept_;
     };
 
-    class duplex final : public dp::duplex_base {
+class duplex final : public dp::duplex_base {
     public:
         duplex(scuttlebutt *sb, const stream_options &opts)
                 : sb_(sb), writable_(opts.writable_), readable_(opts.readable_),
@@ -210,7 +211,9 @@ namespace sb {
         dp::sink raw_sink_ = nullptr;
 
         dp::read peer_read_ = nullptr;
-        dp::source_callback peer_next_ = nullptr;
+        dp::source_callback more_ = nullptr;
+        pull::looper looper_;
+        std::function<void()> looper_next_ = nullptr;
 
     private:
         scuttlebutt *sb_ = nullptr;

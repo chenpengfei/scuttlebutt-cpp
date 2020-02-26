@@ -10,4 +10,4 @@ add_library(scuttlebutt-pull
         scuttlebutt/src/scuttlebutt.cpp
         scuttlebutt/src/utils.cpp)
 
-target_link_libraries(scuttlebutt-pull duplex-pull)
+target_link_libraries(scuttlebutt-pull pull-looper duplex-pull monotonic-timestamp)

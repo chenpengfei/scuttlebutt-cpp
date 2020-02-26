@@ -34,10 +34,14 @@ int main() {
 
     link(s1, s2);
 
-//    int counter = 500000;
+//    const clock_t begin_time = clock();
+//    int max = 50000;
+//    int counter = max;
 //    while(counter-- >= 0) {
 //        a.set("foo", "changed by A ->" + std::to_string(counter));
 //    }
+//    auto ms = float(clock() - begin_time) / (CLOCKS_PER_SEC / 1000);
+//    spdlog::info("time for {} loop, {}ms", max, ms);
 
     assert(s1);
     assert(s2);

@@ -7,7 +7,7 @@ include_directories(
 set(PROJECT_NAME scuttlebutt-pull-examples)
 
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} scuttlebutt-pull monotonic-timestamp)
+target_link_libraries(${PROJECT_NAME} scuttlebutt-pull)
 if (${ENABLE_COVERAGE})
     target_link_libraries(${PROJECT_NAME} -fprofile-arcs -ftest-coverage)
 endif ()
