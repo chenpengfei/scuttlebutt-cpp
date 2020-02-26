@@ -9,6 +9,7 @@
 #include <future>
 #include <utility>
 #include "spdlog/spdlog.h"
+#include "pull-looper/include/pull_looper.h"
 
 namespace pull {
 
@@ -23,6 +24,21 @@ namespace pull {
         };
 
         read(false, more);
+    }
+
+    template<typename T, typename R>
+    decltype(auto) log_with_looper(R &&read) {
+        pull::looper looper;
+        std::function<void()> next = looper(std::function<void()>([&]() {
+            read(false, [&](bool done, T val) {
+                if (!done) {
+                    spdlog::info(val);
+                    next();
+                }
+            });
+        }));
+
+        next();
     }
 
 // https://en.cppreference.com/w/cpp/thread/condition_variable

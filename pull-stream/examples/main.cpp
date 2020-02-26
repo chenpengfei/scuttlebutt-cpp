@@ -13,20 +13,6 @@
 
 using namespace std;
 
-template<typename T, typename R>
-decltype(auto) log_with_looper(R &&read) {
-    std::function<void()> next = pull::looper(std::function<void()>([&]() {
-        read(false, [&](bool done, T val) {
-            if (!done) {
-                spdlog::info(val);
-                next();
-            }
-        });
-    }));
-
-    next();
-}
-
 int main() {
     int n = 500000;
     auto source = pull::values(n);
