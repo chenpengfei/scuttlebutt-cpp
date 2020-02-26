@@ -41,6 +41,7 @@ project(scuttlebutt-cpp)
 
 include_directories(
         include
+        pull-looper
         pull-stream
         duplex-pull
         event-emitter
@@ -49,6 +50,7 @@ include_directories(
         scuttlebutt-pull
 )
 
+add_subdirectory(pull-looper)
 add_subdirectory(pull-stream)
 add_subdirectory(duplex-pull)
 add_subdirectory(event-emitter)
