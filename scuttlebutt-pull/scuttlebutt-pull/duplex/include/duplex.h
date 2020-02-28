@@ -131,9 +131,16 @@ class duplex final : public dp::duplex_base {
 
                     if (!_filter(update, peer_sources_)) { return; }
 
+                    auto ts = std::get<update_items::Timestamp>(update);
+                    auto source = std::get<update_items::SourceId>(update);
+
                     // this update comes from our peer stream, don't send back
                     if (std::get<update_items::From>(update) == peer_id_) {
                         logger->info("'update' ignored by peerId: {}", peer_id_);
+
+                        // now we know that our peer has the latest knowledge of UpdateItems.From at time "UpdateItems.Timestamp"
+                        peer_sources_[source] = ts;
+                        logger->info("updated peerSources to", "peer_sources_");//todo
                         return;
                     }
 
@@ -151,8 +158,6 @@ class duplex final : public dp::duplex_base {
                     logger->info("sent 'update' to peer: {}", "update");//todo
 
                     // really, this should happen before emitting.
-                    auto ts = std::get<update_items::Timestamp>(update);
-                    auto source = std::get<update_items::SourceId>(update);
                     peer_sources_[source] = ts;
                     logger->info("updated peerSources to", "peer_sources_");//todo
                 };
