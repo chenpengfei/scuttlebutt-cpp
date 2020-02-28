@@ -40,8 +40,6 @@ namespace sb {
     dp::sink &duplex::get_raw_sink() {
         if (!raw_sink_) {
             decltype(auto) self = this;
-
-//            looper_ = std::function<std::function<void()>(std::function<void()>)>(pull::looper);
             raw_sink_ = [self](dp::read read) {
                 self->peer_read_ = std::move(read);
                 self->more_ = [self](bool end, const nonstd::any &u) {
@@ -180,7 +178,6 @@ namespace sb {
         }
 
         logger->info("'history' to peer({}) has been sent: {}", peer_id_, "history");//todo
-        sb_->on("_update", get_on_update());
 
         if (readable_) {
             push(std::string("SYNC"));
@@ -188,6 +185,8 @@ namespace sb {
             logger->info("'SYNC' has been sent to peer({})", peer_id_);
             emit("syncSent");
         }
+
+        sb_->on("_update", get_on_update());
 
         rest();
     }
