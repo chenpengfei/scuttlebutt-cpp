@@ -7,6 +7,10 @@
 
 namespace dp {
 
+    bool end_or_err(error err) {
+        return error::end == err || error::err == err;
+    }
+
     void link(duplex_base *a, duplex_base *b) {
         pull::pull(a->source(), b->sink());
         pull::pull(b->source(), a->sink());

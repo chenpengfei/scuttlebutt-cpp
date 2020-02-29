@@ -11,8 +11,8 @@ namespace sb {
     dp::read &sb::duplex::get_raw_source() {
         if (!raw_source_) {
             decltype(auto) self = this;
-            raw_source_ = [self](bool abort, dp::source_callback cb) {
-                if (abort) {
+            raw_source_ = [self](dp::error abort, dp::source_callback cb) {
+                if (dp::end_or_err(abort)) {
                     self->abort_ = abort;
                     // if there is already a cb waiting, abort it.
                     if (self->cb_) {
@@ -42,10 +42,16 @@ namespace sb {
             decltype(auto) self = this;
             raw_sink_ = [self](dp::read read) {
                 self->peer_read_ = std::move(read);
-                self->more_ = [self](bool end, const nonstd::any &u) {
-                    if (end) {
+                self->more_ = [self](dp::error end, const nonstd::any &u) {
+                    if (dp::error::end == end) {
                         self->logger->info("sink ended by peer({}), {}",
                                            self->peer_id_, end);
+                        self->end();
+                        return;
+                    }
+
+                    if (dp::end_or_err(end)) {
+                        self->logger->info("sink reading errors, {}", end);
                         self->end();
                         return;
                     }
@@ -108,7 +114,7 @@ namespace sb {
                 };
 
                 self->looper_next_ = self->looper_(std::function<void()>([self]() {
-                    self->peer_read_(self->abort_ || self->ended_, self->more_);
+                    self->peer_read_(dp::end_or_err(self->abort_)? self->abort_ : self->ended_, self->more_);
                 }));
 
                 self->looper_next_();
@@ -120,7 +126,7 @@ namespace sb {
     void duplex::drain() {
         if (!cb_) {
             // there is no downstream waiting for callback
-            if (ended_ && on_close_) {
+            if (dp::end_or_err(ended_) && on_close_) {
                 // perform _onclose regardless of whether there is data in the cache
                 auto c = on_close_;
                 on_close_ = nullptr;
@@ -132,13 +138,13 @@ namespace sb {
         if (abort_) {
             // downstream is waiting for abort
             callback(abort_);
-        } else if (buffer_.empty() && ended_) {
+        } else if (buffer_.empty() && dp::end_or_err(ended_)) {
             // we'd like to end and there is no left items to be sent
             callback(ended_);
         } else if (!buffer_.empty()) {
             auto payload = buffer_.front();
             buffer_.pop_front();
-            callback(false, payload);
+            callback(dp::error::ok, payload);
         }
     }
 

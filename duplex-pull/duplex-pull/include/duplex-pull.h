@@ -11,9 +11,17 @@
 
 namespace dp {
 
-    using source_callback = std::function<void(bool, const nonstd::any&)>;
+    enum error {
+        ok = 0,
+        end,
+        err,
+    };
 
-    using read = std::function<void(bool, source_callback)>;
+    bool end_or_err(error err);
+
+    using source_callback = std::function<void(error, const nonstd::any&)>;
+
+    using read = std::function<void(error, source_callback)>;
 
     using sink = std::function<void(read)>;
 

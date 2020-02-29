@@ -82,7 +82,7 @@ class duplex final : public dp::duplex_base {
         std::function<void()> &get_on_end() {
             if (on_end_ == nullptr) {
                 on_end_ = [this]() {
-                    ended_ = true;
+                    ended_ = dp::error::end;
                     // attempt to drain
                     drain();
                 };
@@ -92,7 +92,7 @@ class duplex final : public dp::duplex_base {
 
         void drain();
 
-        void callback(bool end, const nonstd::any &data = nonstd::any()) {
+        void callback(dp::error end, const nonstd::any &data = nonstd::any()) {
             auto cb = cb_;
             if (end && on_close_) {
                 auto c = on_close_;
@@ -170,7 +170,7 @@ class duplex final : public dp::duplex_base {
         dp::sink &get_raw_sink();
 
         void push(nonstd::any data, bool to_head = false) {
-            if (ended_) { return; }
+            if (dp::end_or_err(ended_)) { return; }
 
             // if sink already waiting,
             // we can call back directly.
@@ -228,8 +228,8 @@ class duplex final : public dp::duplex_base {
         std::string wrapper_ = "json";
         bool readable_ = true;
         bool writable_ = true;
-        bool ended_ = false;
-        bool abort_ = false;
+        dp::error ended_ = dp::error::ok;
+        dp::error abort_ = dp::error::ok;
         bool sync_sent_ = false;
         bool sync_recv_ = false;
         std::deque<nonstd::any> buffer_;
