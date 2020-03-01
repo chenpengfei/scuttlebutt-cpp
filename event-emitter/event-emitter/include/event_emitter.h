@@ -34,7 +34,7 @@ struct any_callable {
 
 class event_emitter {
 public:
-    virtual ~event_emitter() {}
+    virtual ~event_emitter() = default;
 
     /**
      * Synchronously calls each of the listeners registered for the event named eventName,
