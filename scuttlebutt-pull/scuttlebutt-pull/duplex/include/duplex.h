@@ -25,11 +25,12 @@ namespace sb {
         model_accept accept_;
     };
 
-class duplex final : public dp::duplex_base {
+class duplex final : public dp::duplex_pull {
     public:
         duplex(scuttlebutt *sb, const stream_options &opts)
-                : sb_(sb), writable_(opts.writable_), readable_(opts.readable_),
-                  tail_(opts.tail_), meta_(opts.meta_) {
+                : sb_(sb),tail_(opts.tail_), meta_(opts.meta_) {
+            writable_ = opts.writable_;
+            readable_ = opts.readable_;
 
             name_ = (!opts.name_.empty() ? opts.name_ : "stream");
             wrapper_ = (!opts.wrapper_.empty() ? opts.wrapper_ : "json");
@@ -107,7 +108,7 @@ class duplex final : public dp::duplex_base {
                 if (data.type() == typeid(sb::update)) {
                     // if payload is an update
                     ++sent_counter_;
-                    emit("updateSent", (dp::duplex_base *) this, data, sent_counter_,
+                    emit("updateSent", (dp::duplex_pull *) this, data, sent_counter_,
                          std::string(sb_->id_ + "/" + name_));
                 }
             }
@@ -188,27 +189,6 @@ class duplex final : public dp::duplex_base {
 
         void start(const outgoing &incoming);
 
-    public:
-        std::string name() override {
-            return name_;
-        }
-
-        bool readable() override {
-            return readable_;
-        }
-
-        void readable(bool value) override {
-            readable_ = value;
-        }
-
-        bool writable() override {
-            return writable_;
-        }
-
-        void writable(bool value) override {
-            writable_ = value;
-        }
-
     private:
         std::function<void()> on_end_ = nullptr;
         std::function<void(sb::update &update)> on_update_ = nullptr;
@@ -222,18 +202,15 @@ class duplex final : public dp::duplex_base {
 
     private:
         scuttlebutt *sb_ = nullptr;
-        std::string name_ = "stream";
         dp::read source_ = nullptr;
         dp::sink sink_ = nullptr;
+        dp::source_callback cb_;
         std::string wrapper_ = "json";
-        bool readable_ = true;
-        bool writable_ = true;
         dp::error ended_ = dp::error::ok;
         dp::error abort_ = dp::error::ok;
         bool sync_sent_ = false;
         bool sync_recv_ = false;
         std::deque<nonstd::any> buffer_;
-        dp::source_callback cb_;
         on_close on_close_ = nullptr;
         bool is_first_read_ = true;
         int sent_counter_ = 0; // update count that the stream has sent

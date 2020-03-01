@@ -22,8 +22,8 @@ TEST(whitelist_filter_out_in_history, model_filter) {
     model a(scuttlebutt_options("A"));
     model b(scuttlebutt_options{"B", accept});
 
-    std::unique_ptr<dp::duplex_base> s1(a.create_stream(stream_options("a->b")));
-    std::unique_ptr<dp::duplex_base> s2(b.create_stream(stream_options("b->a")));
+    std::unique_ptr<dp::duplex_pull> s1(a.create_stream(stream_options("a->b")));
+    std::unique_ptr<dp::duplex_pull> s2(b.create_stream(stream_options("b->a")));
 
     a.set(expected.key, expected.valueA);
     a.set(ignored.key, expected.valueA);
@@ -40,8 +40,8 @@ TEST(whitelist_filter_out_in_following_update, model_filter) {
     model a(scuttlebutt_options("A"));
     model b(scuttlebutt_options{"B", accept});
 
-    std::unique_ptr<dp::duplex_base> s1(a.create_stream(stream_options("a->b")));
-    std::unique_ptr<dp::duplex_base> s2(b.create_stream(stream_options("b->a")));
+    std::unique_ptr<dp::duplex_pull> s1(a.create_stream(stream_options("a->b")));
+    std::unique_ptr<dp::duplex_pull> s2(b.create_stream(stream_options("b->a")));
 
     link(s1, s2);
 

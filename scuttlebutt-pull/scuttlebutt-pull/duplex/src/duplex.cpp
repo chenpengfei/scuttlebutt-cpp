@@ -63,7 +63,7 @@ namespace sb {
 
                         // counting the update that current stream received
                         ++(self->received_counter_);
-                        self->emit("updateReceived", (dp::duplex_base *) self,
+                        self->emit("updateReceived", (dp::duplex_pull *) self,
                                    u,
                                    self->received_counter_,
                                    std::string(self->sb_->id_ + "/" +
@@ -119,8 +119,8 @@ namespace sb {
 
                 self->looper_next_();
             };
-            return raw_sink_;
         }
+        return raw_sink_;
     }
 
     void duplex::drain() {

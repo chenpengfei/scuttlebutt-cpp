@@ -87,29 +87,29 @@ namespace sb {
         return _update(std::make_tuple(trx, monotonic_timestamp::timestamp(), id_, "", ""));
     }
 
-    dp::duplex_base *scuttlebutt::create_stream(const stream_options &opts = stream_options{}) {
+    dp::duplex_pull *scuttlebutt::create_stream(const stream_options &opts = stream_options{}) {
         return new duplex(this, opts);
     }
 
-    dp::duplex_base *scuttlebutt::create_write_stream(stream_options &opts) {
+    dp::duplex_pull *scuttlebutt::create_write_stream(stream_options &opts) {
         opts.writable_ = true;
         opts.readable_ = false;
         return create_stream(opts);
     }
 
-    dp::duplex_base *scuttlebutt::create_sink_stream(stream_options &opts) {
+    dp::duplex_pull *scuttlebutt::create_sink_stream(stream_options &opts) {
         opts.writable_ = true;
         opts.readable_ = false;
         return create_stream(opts);
     }
 
-    dp::duplex_base *scuttlebutt::create_read_stream(stream_options &opts) {
+    dp::duplex_pull *scuttlebutt::create_read_stream(stream_options &opts) {
         opts.writable_ = false;
         opts.readable_ = true;
         return create_stream(opts);
     }
 
-    dp::duplex_base *scuttlebutt::create_source_stream(stream_options &opts) {
+    dp::duplex_pull *scuttlebutt::create_source_stream(stream_options &opts) {
         opts.writable_ = false;
         opts.readable_ = true;
         return create_stream(opts);

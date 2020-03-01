@@ -103,15 +103,15 @@ namespace sb {
 
         bool _update(update update);
 
-        dp::duplex_base *create_stream(const stream_options &opts);
+        dp::duplex_pull *create_stream(const stream_options &opts);
 
-        dp::duplex_base *create_write_stream(stream_options &opts);
+        dp::duplex_pull *create_write_stream(stream_options &opts);
 
-        dp::duplex_base *create_sink_stream(stream_options &opts);
+        dp::duplex_pull *create_sink_stream(stream_options &opts);
 
-        dp::duplex_base *create_read_stream(stream_options &opts);
+        dp::duplex_pull *create_read_stream(stream_options &opts);
 
-        dp::duplex_base *create_source_stream(stream_options &opts);
+        dp::duplex_pull *create_source_stream(stream_options &opts);
 
     public:
         virtual bool is_accepted(const model_accept &peer_accept, const update &update) = 0;

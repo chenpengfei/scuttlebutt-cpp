@@ -41,8 +41,8 @@ TEST(change_before_sync, model) {
     model a(scuttlebutt_options("A"));
     model b(scuttlebutt_options{"B"});
 
-    std::unique_ptr<dp::duplex_base> s1(a.create_stream(stream_options("a->b")));
-    std::unique_ptr<dp::duplex_base> s2(b.create_stream(stream_options("b->a")));
+    std::unique_ptr<dp::duplex_pull> s1(a.create_stream(stream_options("a->b")));
+    std::unique_ptr<dp::duplex_pull> s2(b.create_stream(stream_options("b->a")));
 
     a.set(expected.key, expected.valueA);
 
@@ -57,8 +57,8 @@ TEST(change_after_sync, model) {
     model a(scuttlebutt_options("A"));
     model b(scuttlebutt_options{"B"});
 
-    std::unique_ptr<dp::duplex_base> s1(a.create_stream(stream_options("a->b")));
-    std::unique_ptr<dp::duplex_base> s2(b.create_stream(stream_options("b->a")));
+    std::unique_ptr<dp::duplex_pull> s1(a.create_stream(stream_options("a->b")));
+    std::unique_ptr<dp::duplex_pull> s2(b.create_stream(stream_options("b->a")));
 
     b.on("changedByPeer",
          changed_by_peer_listener([&](std::string &key, nonstd::any &value, const sb::from &from) {
@@ -75,8 +75,8 @@ TEST(change_in_two_ways, model) {
     model a(scuttlebutt_options("A"));
     model b(scuttlebutt_options{"B"});
 
-    std::unique_ptr<dp::duplex_base> s1(a.create_stream(stream_options("a->b")));
-    std::unique_ptr<dp::duplex_base> s2(b.create_stream(stream_options("b->a")));
+    std::unique_ptr<dp::duplex_pull> s1(a.create_stream(stream_options("a->b")));
+    std::unique_ptr<dp::duplex_pull> s2(b.create_stream(stream_options("b->a")));
 
     a.set(expected.key, expected.valueA);
 

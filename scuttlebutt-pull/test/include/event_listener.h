@@ -8,10 +8,10 @@
 #include <functional>
 #include "duplex.h"
 
-using update_sent_listener = std::function<void(dp::duplex_base *duplex, const nonstd::any &update,
+using update_sent_listener = std::function<void(dp::duplex_pull *duplex, const nonstd::any &update,
                                                 int &sent_counter, std::string id_name)>;
 
-using update_received_listener = std::function<void(dp::duplex_base *duplex,
+using update_received_listener = std::function<void(dp::duplex_pull *duplex,
                                                     const nonstd::any &update,
                                                     int &sent_counter, std::string id_name)>;
 

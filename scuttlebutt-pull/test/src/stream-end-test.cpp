@@ -14,8 +14,8 @@ TEST(end_one_stream, stream) {
     model a(scuttlebutt_options("A"));
     model b(scuttlebutt_options("B"));
 
-    std::unique_ptr<dp::duplex_base> s1(a.create_stream(stream_options("a->b")));
-    std::unique_ptr<dp::duplex_base> s2(b.create_stream(stream_options("b->a")));
+    std::unique_ptr<dp::duplex_pull> s1(a.create_stream(stream_options("a->b")));
+    std::unique_ptr<dp::duplex_pull> s2(b.create_stream(stream_options("b->a")));
 
     link(s1, s2);
 
@@ -32,8 +32,8 @@ TEST(stream_count_when_end, stream) {
     model a(scuttlebutt_options("A"));
     model b(scuttlebutt_options("B"));
 
-    std::unique_ptr<dp::duplex_base> s1(a.create_stream(stream_options("a->b")));
-    std::unique_ptr<dp::duplex_base> s2(b.create_stream(stream_options("b->a")));
+    std::unique_ptr<dp::duplex_pull> s1(a.create_stream(stream_options("a->b")));
+    std::unique_ptr<dp::duplex_pull> s2(b.create_stream(stream_options("b->a")));
 
     ASSERT_EQ(1, a.streams);
     ASSERT_EQ(1, b.streams);
@@ -52,8 +52,8 @@ TEST(stream_count_when_end, stream) {
 TEST(stream_count_when_dispose, stream) {
     model a(scuttlebutt_options("A"));
 
-    std::unique_ptr<dp::duplex_base> s1(a.create_stream(stream_options("s1")));
-    std::unique_ptr<dp::duplex_base> s2(a.create_stream(stream_options("s2")));
+    std::unique_ptr<dp::duplex_pull> s1(a.create_stream(stream_options("s1")));
+    std::unique_ptr<dp::duplex_pull> s2(a.create_stream(stream_options("s2")));
 
     ASSERT_EQ(2, a.streams);
 
