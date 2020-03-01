@@ -11,12 +11,12 @@ namespace dp {
         return error::end == err || error::err == err;
     }
 
-    void link(duplex_base *a, duplex_base *b) {
+    void link(duplex_pull *a, duplex_pull *b) {
         pull::pull(a->source(), b->sink());
         pull::pull(b->source(), a->sink());
     }
 
-    void link(const std::unique_ptr<duplex_base> &a, const std::unique_ptr<duplex_base> &b) {
+    void link(const std::unique_ptr<duplex_pull> &a, const std::unique_ptr<duplex_pull> &b) {
         pull::pull(a->source(), b->sink());
         pull::pull(b->source(), a->sink());
     }

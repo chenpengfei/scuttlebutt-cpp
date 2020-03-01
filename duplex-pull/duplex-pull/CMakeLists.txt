@@ -1,6 +1,6 @@
 include_directories(include)
 
-set(SOURCE_FILES src/duplex-pull.cpp)
+set(SOURCE_FILES src/stream.cpp)
 
 add_library(duplex-pull ${SOURCE_FILES})
 

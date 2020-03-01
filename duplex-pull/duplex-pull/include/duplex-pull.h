@@ -19,31 +19,41 @@ namespace dp {
 
     bool end_or_err(error err);
 
-    using source_callback = std::function<void(error, const nonstd::any&)>;
+    using source_callback = std::function<void(error, const nonstd::any &)>;
 
     using read = std::function<void(error, source_callback)>;
 
     using sink = std::function<void(read)>;
 
-    class duplex_base : public event_emitter {
+    class duplex_pull : public event_emitter {
     public:
-        virtual ~duplex_base() {}
-        
+        ~duplex_pull() override = default;
+
         virtual read &source() = 0;
+
         virtual sink &sink() = 0;
 
-        virtual std::string name() = 0;
-        virtual bool readable() = 0;
-        virtual void readable(bool value) = 0;
-        virtual bool writable() = 0;
-        virtual void writable(bool value) = 0;
-
         virtual void end() = 0;
+
+        std::string name() { return name_; }
+
+        bool readable() { return readable_; }
+
+        void readable(bool value) { readable_ = value; }
+
+        bool writable() { return writable_; }
+
+        void writable(bool value) { writable_ = value; }
+
+    protected:
+        std::string name_ = "stream";
+        bool readable_ = true;
+        bool writable_ = true;
     };
 
-    void link(duplex_base *a, duplex_base *b);
+    void link(duplex_pull *a, duplex_pull *b);
 
-    void link(const std::unique_ptr<duplex_base> &a, const std::unique_ptr<duplex_base> &b);
+    void link(const std::unique_ptr<duplex_pull> &a, const std::unique_ptr<duplex_pull> &b);
 }
 
 #endif //SCUTTLEBUTT_DUPLEX_PULL_H
