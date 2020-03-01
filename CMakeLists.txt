@@ -48,6 +48,8 @@ include_directories(
         event-loop
         monotonic-timestamp
         scuttlebutt-pull
+        duplex-stream
+        duplex-stream-to-pull
 )
 
 add_subdirectory(pull-looper)
@@ -57,5 +59,7 @@ add_subdirectory(event-emitter)
 add_subdirectory(event-loop)
 add_subdirectory(monotonic-timestamp)
 add_subdirectory(scuttlebutt-pull)
+add_subdirectory(duplex-stream)
+add_subdirectory(duplex-stream-to-pull)
 
 
