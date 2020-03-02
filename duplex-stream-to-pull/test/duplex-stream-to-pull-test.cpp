@@ -69,16 +69,13 @@ TEST(source_to_sink, duplex_stream_to_pull) {
             .Times(3)
             .WillOnce(Invoke([&r_buffer_](char *buffer, size_t buffer_len) {
                 strncpy(buffer, r_buffer_, 1);
-                spdlog::info("hello 1");
                 return 1;
             }))
             .WillOnce(Invoke([&r_buffer_](char *buffer, size_t buffer_len) {
                 strncpy(buffer, r_buffer_ + 1, 2);
-                spdlog::info("hello 2");
                 return 2;
             }))
             .WillOnce(Invoke([&r_buffer_](char *buffer, size_t buffer_len) {
-                spdlog::info("hello 3");
                 return 0;
             }));
 
