@@ -47,7 +47,7 @@ dp::read &duplex_stream_to_pull::source() {
     if (!raw_source_) {
         decltype(auto) self = this;
 
-        raw_source_ = [self](dp::error abort, dp::source_callback cb) {
+        raw_source_ = [self](dp::error abort, const dp::source_callback& cb) {
             self->r_cb_ = cb;
             if (dp::end_or_err(self->r_ended_)) {
                 cb(self->r_ended_, nullptr);
