@@ -8,6 +8,7 @@
 #include <iostream>
 #include "nonstd/any.h"
 #include "event-emitter/include/event_emitter.h"
+#include "nlohmann/json.hpp"
 
 namespace dp {
 
@@ -19,11 +20,13 @@ namespace dp {
 
     bool end_or_err(error err);
 
-    using source_callback = std::function<void(error, const nonstd::any &)>;
+    using source_callback = std::function<void(error, const nlohmann::json &)>;
 
     using read = std::function<void(error, source_callback)>;
 
     using sink = std::function<void(read)>;
+
+    using through = std::function<read(read)>;
 
     class duplex_pull : public event_emitter {
     public:
