@@ -10,58 +10,66 @@
 #include "duplex-pull/include/duplex-pull.h"
 #include "nlohmann/json.hpp"
 
-struct pull_stringify_options {
-    std::string open_ = "";
-    std::string prefix_ = "";
-    std::string suffix = "\n";
-    std::string close_ = "";
-    int indent_ = 2;
-};
+namespace pull {
 
-class pull_stringify final {
-public:
-    explicit pull_stringify(pull_stringify_options opts = pull_stringify_options{})
-        : opts_(std::move(opts)) {
-    }
+    struct pull_stringify_options {
+        std::string open_ = "";
+        std::string prefix_ = "";
+        std::string suffix = "\n";
+        std::string close_ = "";
+        int indent_ = 2;
+    };
 
-    dp::read operator()(dp::read read) {
-        auto self = this;
-        self->peer_read_ = std::move(read);
+    class pull_stringify final {
+    public:
+        virtual ~pull_stringify() = default;
 
-        return [self](dp::error end, dp::source_callback cb) {
-            self->cb_ = std::move(cb);
+        explicit pull_stringify(pull_stringify_options opts = pull_stringify_options{})
+                : opts_(std::move(opts)) {
+        }
 
-            if (dp::end_or_err(self->ended_) || dp::end_or_err(end)) {
-                return self->cb_(dp::end_or_err(self->ended_)? self->ended_ : end, nullptr);
-            }
+        dp::read operator()(dp::read read) {
+            auto self = this;
+            self->peer_read_ = std::move(read);
 
-            self->peer_read_(dp::error::ok, [self](dp::error end, const nlohmann::json &data) {
-                if (dp::error::ok == end) {
-                    auto f = self->first_;
-                    self->first_ = false;
+            return [self](dp::error end, dp::source_callback cb) {
+                self->cb_ = std::move(cb);
 
-                    auto serialized = data.dump(self->opts_.indent_);
-                    auto str = (f? self->opts_.open_ : self->opts_.prefix_) + serialized + self->opts_.suffix;
-                    self->cb_(dp::error::ok, str);
-                } else {
-                    self->ended_ = end;
-                    if (self->ended_ != dp::error::end) {
-                        return self->cb_(self->ended_, nullptr);
-                    }
-                    self->cb_(dp::error::ok, self->first_? self->opts_.open_ + self->opts_.close_ : self->opts_.close_);
+                if (dp::end_or_err(self->ended_) || dp::end_or_err(end)) {
+                    return self->cb_(dp::end_or_err(self->ended_) ? self->ended_ : end, nullptr);
                 }
-            });
-        };
-    }
 
-private:
-    pull_stringify_options opts_;
+                self->peer_read_(dp::error::ok, [self](dp::error end, const nlohmann::json &data) {
+                    if (dp::error::ok == end) {
+                        auto f = self->first_;
+                        self->first_ = false;
 
-    bool first_ = true;
-    dp::error ended_ = dp::error::ok;
+                        auto serialized = data.dump(self->opts_.indent_);
+                        auto str = (f ? self->opts_.open_ : self->opts_.prefix_) + serialized +
+                                   self->opts_.suffix;
+                        self->cb_(dp::error::ok, str);
+                    } else {
+                        self->ended_ = end;
+                        if (self->ended_ != dp::error::end) {
+                            return self->cb_(self->ended_, nullptr);
+                        }
+                        self->cb_(dp::error::ok,
+                                  self->first_ ? self->opts_.open_ + self->opts_.close_
+                                               : self->opts_.close_);
+                    }
+                });
+            };
+        }
 
-    dp::read peer_read_ = nullptr;
-    dp::source_callback cb_ = nullptr;
-};
+    private:
+        pull_stringify_options opts_;
+
+        bool first_ = true;
+        dp::error ended_ = dp::error::ok;
+
+        dp::read peer_read_ = nullptr;
+        dp::source_callback cb_ = nullptr;
+    };
+}
 
 #endif //SCUTTLEBUTT_PULL_STRINGIFY_H

@@ -2,9 +2,7 @@ include_directories(include)
 include_directories(../pull-stringify/include)
 include_directories(${gtest_SOURCE_DIR}/include)
 
-set(SOURCE_FILES
-        src/pull-stringify-test.cpp
-        )
+set(SOURCE_FILES pull-stringify-test.cpp)
 
 set(PROJECT_NAME pull-stringify-test)
 

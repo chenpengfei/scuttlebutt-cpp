@@ -15,11 +15,13 @@ struct person {
     int age;
 };
 
-void to_json(nlohmann::json& j, const person& p) {
-    j = nlohmann::json{{"name", p.name}, {"address", p.address}, {"age", p.age}};
+void to_json(nlohmann::json &j, const person &p) {
+    j = nlohmann::json{{"name",    p.name},
+                       {"address", p.address},
+                       {"age",     p.age}};
 }
 
-void from_json(const nlohmann::json& j, person& p) {
+void from_json(const nlohmann::json &j, person &p) {
     j.at("name").get_to(p.name);
     j.at("address").get_to(p.address);
     j.at("age").get_to(p.age);
@@ -30,7 +32,7 @@ int main() {
     vector<person> vec;
     vec.reserve(n);
     for (auto i = 1; i < n; ++i) {
-        vec.push_back(person{to_string(i)+"_name", to_string(i)+"address", i});
+        vec.push_back(person{to_string(i) + "_name", to_string(i) + "address", i});
     }
 
     auto begin = vec.begin();
@@ -38,7 +40,7 @@ int main() {
     auto source = pull::values(begin, end);
     auto sink = [&](auto read) { pull::log_with_looper<nlohmann::json>(read); };
 
-    pull_stringify through;
+    pull::pull_stringify through;
     pull::pull(source, through, sink);
 
     return 0;
