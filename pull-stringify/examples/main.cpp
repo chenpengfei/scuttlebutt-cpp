@@ -39,7 +39,7 @@ int main() {
     auto sink = [&](auto read) { pull::log_with_looper<nlohmann::json>(read); };
 
     pull_stringify through;
-    pull::pull(source, through.serialize(), sink);
+    pull::pull(source, through, sink);
 
     return 0;
 }
