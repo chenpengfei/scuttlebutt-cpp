@@ -61,5 +61,6 @@ add_subdirectory(monotonic-timestamp)
 add_subdirectory(scuttlebutt-pull)
 add_subdirectory(duplex-stream)
 add_subdirectory(duplex-stream-to-pull)
+add_subdirectory(pull-stringify)
 
 
