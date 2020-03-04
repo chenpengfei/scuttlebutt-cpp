@@ -20,16 +20,16 @@ TEST(update_sent_received_event, stream) {
 
     int s1_update_sent_fired_counter = 0;
     update_sent_listener s1_update_sent_fired = [&](dp::duplex_pull *duplex,
-                                                    const nonstd::any &update,
+                                                    const nlohmann::json &update,
                                                     int &sent_counter, std::string id_name) {
         ASSERT_EQ(s1.get(), duplex);
-        ASSERT_EQ(update.type(), typeid(sb::update));
+        ASSERT_TRUE(update.is_array());
         ASSERT_EQ(a.id_ + "/" + s1->name(), id_name);
         ++s1_update_sent_fired_counter;
     };
     int s1_update_received_fired_counter = 0;
     update_received_listener s1_update_received_fired = [&](dp::duplex_pull *duplex,
-                                                            const nonstd::any &update,
+                                                            const nlohmann::json &update,
                                                             int &sent_counter,
                                                             std::string id_name) {
         ++s1_update_received_fired_counter;
@@ -37,17 +37,17 @@ TEST(update_sent_received_event, stream) {
 
     int s2_update_sent_fired_counter = 0;
     update_sent_listener s2_update_sent_fired = [&](dp::duplex_pull *duplex,
-                                                    const nonstd::any &update,
+                                                    const nlohmann::json &update,
                                                     int &sent_counter, std::string id_name) {
         ++s2_update_sent_fired_counter;
     };
     int s2_update_received_fired_counter = 0;
     update_received_listener s2_update_received_fired = [&](dp::duplex_pull *duplex,
-                                                            const nonstd::any &update,
+                                                            const nlohmann::json &update,
                                                             int &sent_counter,
                                                             std::string id_name) {
         ASSERT_EQ(s2.get(), duplex);
-        ASSERT_EQ(update.type(), typeid(sb::update));
+        ASSERT_TRUE(update.is_array());
         ASSERT_EQ(b.id_ + "/" + s2->name(), id_name);
         ++s2_update_received_fired_counter;
     };

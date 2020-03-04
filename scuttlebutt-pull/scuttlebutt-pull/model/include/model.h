@@ -35,11 +35,10 @@ namespace sb {
         ValueType get_without_clock(const std::string &k) {
             auto it = store_.find(k);
             if (it != store_.end()) {
-                auto update = nonstd::any_cast<sb::update>(it->second);
-                auto data_any = std::get<update_items::Data>(update);
-                auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
-                auto data_value = std::get<model_value_items::Value>(data);
-                return nonstd::any_cast<ValueType>(data_value);
+                auto any = std::get<update_items::Data>(it->second);
+                auto kv = any.get<std::pair<std::string, nlohmann::json>>();
+                auto v = std::get<model_value_items::Value>(kv);
+                return v.get<ValueType>();
             }
             return ValueType{};
         }

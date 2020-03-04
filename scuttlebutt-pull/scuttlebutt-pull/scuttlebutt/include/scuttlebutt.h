@@ -14,6 +14,7 @@
 #include "event-emitter/include/event_emitter.h"
 #include "duplex-pull/include/duplex-pull.h"
 #include "util.h"
+#include "nlohmann/json.hpp"
 
 namespace sb {
 
@@ -35,6 +36,10 @@ namespace sb {
         std::vector<std::string> whitelist_;
         std::vector<std::string> blacklist_;
     };
+
+    void to_json(nlohmann::json& j, const model_accept& m);
+
+    void from_json(const nlohmann::json& j, model_accept& m);
 
     struct scuttlebutt_options {
         scuttlebutt_options(std::string id = "") : id_(id) {}
@@ -60,7 +65,7 @@ namespace sb {
         sources clock_;
         bool send_clock_ = true;
         std::string wrapper_ = "";
-        nonstd::any meta_;
+        nlohmann::json meta_;
     };
 
     enum update_items {
@@ -71,7 +76,7 @@ namespace sb {
         Singed,
     };
 
-    using update = std::tuple<nonstd::any, timestamp, source_id, from, singed>;
+    using update = std::tuple<nlohmann::json, timestamp, source_id, from, singed>;
     using verify = std::function<bool(const update &)>;
     using sign = std::function<singed(const update &)>;
 
@@ -122,7 +127,7 @@ namespace sb {
         history(const sources &peer_sources, const model_accept &accept) = 0;
 
     protected:
-        bool local_update(const std::pair<std::string, nonstd::any> trx);
+        bool local_update(const std::pair<std::string, nlohmann::json>& trx);
 
     private:
         sign sign_ = nullptr;

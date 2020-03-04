@@ -3,10 +3,23 @@
 //
 
 #include <utility>
-#include <scuttlebutt-pull/duplex/include/duplex.h>
-#include "pull-looper/include//pull_looper.h"
+#include "scuttlebutt-pull/duplex/include/duplex.h"
 
 namespace sb {
+
+    void to_json(nlohmann::json& j, const outgoing& o) {
+        j = nlohmann::json{
+                {"id", o.id_},
+                {"clock", o.clock_},
+                {"accept", o.accept_}
+        };
+    }
+
+    void from_json(const nlohmann::json& j, outgoing& o) {
+        j.at("id").get_to(o.id_);
+        j.at("clock").get_to(o.clock_);
+        j.at("accept").get_to(o.accept_);
+    }
 
     dp::read &sb::duplex::get_raw_source() {
         if (!raw_source_) {
@@ -42,7 +55,7 @@ namespace sb {
             decltype(auto) self = this;
             raw_sink_ = [self](dp::read read) {
                 self->peer_read_ = std::move(read);
-                self->more_ = [self](dp::error end, const nonstd::any &u) {
+                self->more_ = [self](dp::error end, const nlohmann::json &u) {
                     if (dp::error::end == end) {
                         self->logger->info("sink ended by peer({}), {}",
                                            self->peer_id_, end);
@@ -56,11 +69,10 @@ namespace sb {
                         return;
                     }
 
-                    if (u.type() == typeid(sb::update)) {
-                        self->logger->info("sink reads data from peer({}): {}",
-                                           self->peer_id_,
-                                           "update");//todo
+                    self->logger->info("sink reads data from peer({}): {}",
+                            self->peer_id_.empty()? u.get<outgoing>().id_ : self->peer_id_, u.dump());
 
+                    if (u.is_array()) {
                         // counting the update that current stream received
                         ++(self->received_counter_);
                         self->emit("updateReceived", (dp::duplex_pull *) self,
@@ -71,13 +83,9 @@ namespace sb {
 
                         if (!self->writable_) { return; }
 
-                        self->sb_->_update(nonstd::any_cast<sb::update>(u));
-                    } else if (u.type() == typeid(std::string)) {
-                        self->logger->info("sink reads data from peer({}): {}",
-                                           self->peer_id_,
-                                           nonstd::any_cast<std::string>(u));//todo
-
-                        auto cmd = nonstd::any_cast<std::string>(u);
+                        self->sb_->_update(u.get<sb::update>());
+                    } else if (u.is_string()) {
+                        auto cmd = u.get<std::string>();
                         if (cmd == "SYNC") {
                             if (self->writable_) {
                                 self->logger->info("SYNC received");
@@ -94,12 +102,7 @@ namespace sb {
                             }
                         }
                     } else {
-                        outgoing o = nonstd::any_cast<outgoing>(u);
-                        self->logger->info("sink reads data from peer({}): [{} {}]",
-                                           o.clock_.empty()? "" : o.clock_.begin()->first ,
-                                           o.clock_.empty()? "" : o.clock_.begin()->first,
-                                           o.clock_.empty()? 0.0 : o.clock_.begin()->second);//todo
-
+                        auto o = u.get<outgoing>();
                         if (self->readable_) {
                             // it's a scuttlebutt digest(vector clocks)
                             self->start(o);
@@ -183,7 +186,7 @@ namespace sb {
             push(*it);
         }
 
-        logger->info("'history' to peer({}) has been sent: {}", peer_id_, "history");//todo
+        logger->info("'history' to peer({}) has been sent: {}", peer_id_, nlohmann::json(history).dump());
 
         if (readable_) {
             push(std::string("SYNC"));

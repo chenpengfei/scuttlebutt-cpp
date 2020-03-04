@@ -12,6 +12,18 @@ const auto default_logger = debug::create("sb");
 
 namespace sb {
 
+    void to_json(nlohmann::json& j, const model_accept& m) {
+        j = nlohmann::json{
+                {"whitelist",     m.whitelist_},
+                {"blacklist",  m.blacklist_},
+        };
+    }
+
+    void from_json(const nlohmann::json& j, model_accept& m) {
+        j.at("whitelist").get_to(m.whitelist_);
+        j.at("blacklist").get_to(m.blacklist_);
+    }
+
     scuttlebutt::scuttlebutt(scuttlebutt_options opts)
             : accept_(opts.accept_) {
         auto id = opts.id_;
@@ -27,15 +39,11 @@ namespace sb {
     }
 
     bool scuttlebutt::_update(sb::update update) {
-        auto data_any = std::get<update_items::Data>(update);
-        auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
+        auto &any = std::get<update_items::Data>(update);
+        auto data = any.get<std::pair<std::string, nlohmann::json>>();
         auto key = std::get<model_value_items::Key>(data);
         auto value = std::get<model_value_items::Value>(data);
-        logger->info("_update: [ [{} {}] {} {} ]",
-                     key,
-                     nonstd::any_cast<std::string>(value),
-                     std::get<sb::update_items::Timestamp>(update),
-                     std::get<sb::update_items::SourceId>(update));//todo
+        logger->info("_update: {}", nlohmann::json(update).dump());
 
         auto ts = std::get<update_items::Timestamp>(update);
         auto source_id = std::get<update_items::SourceId>(update);
@@ -83,7 +91,7 @@ namespace sb {
         }
     }
 
-    bool scuttlebutt::local_update(const std::pair<std::string, nonstd::any> trx) {
+    bool scuttlebutt::local_update(const std::pair<std::string, nlohmann::json>& trx) {
         return _update(std::make_tuple(trx, monotonic_timestamp::timestamp(), id_, "", ""));
     }
 

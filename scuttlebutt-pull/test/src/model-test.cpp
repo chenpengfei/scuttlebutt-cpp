@@ -21,14 +21,14 @@ TEST(local_change, model) {
     model a(scuttlebutt_options("A"));
 
     auto c = 2;
-    a.on("changed", changed_with_kv_listener([&](std::string &key, nonstd::any &value) {
+    a.on("changed", changed_with_kv_listener([&](std::string &key, nlohmann::json &value) {
         ASSERT_EQ(expected.key, key);
-        ASSERT_EQ(expected.valueA, nonstd::any_cast<std::string>(value));
+        ASSERT_EQ(expected.valueA, value.get<std::string>());
         --c;
     }));
 
-    a.on("changed:" + expected.key, changed_with_v_listener([&](nonstd::any &value) {
-        ASSERT_EQ(expected.valueA, nonstd::any_cast<std::string>(value));
+    a.on("changed:" + expected.key, changed_with_v_listener([&](nlohmann::json &value) {
+        ASSERT_EQ(expected.valueA, value.get<std::string>());
         --c;
     }));
 
@@ -61,9 +61,9 @@ TEST(change_after_sync, model) {
     std::unique_ptr<dp::duplex_pull> s2(b.create_stream(stream_options("b->a")));
 
     b.on("changedByPeer",
-         changed_by_peer_listener([&](std::string &key, nonstd::any &value, const sb::from &from) {
+         changed_by_peer_listener([&](std::string &key, nlohmann::json &value, const sb::from &from) {
              ASSERT_EQ(expected.key, key);
-             ASSERT_EQ(expected.valueA, nonstd::any_cast<std::string>(value));
+             ASSERT_EQ(expected.valueA, value.get<std::string>());
              ASSERT_EQ(expected.valueA, b.get_without_clock<std::string>(expected.key));
          }));
 
@@ -81,17 +81,17 @@ TEST(change_in_two_ways, model) {
     a.set(expected.key, expected.valueA);
 
     b.on("changedByPeer",
-         changed_by_peer_listener([&](std::string &key, nonstd::any &value, const sb::from &from) {
+         changed_by_peer_listener([&](std::string &key, nlohmann::json &value, const sb::from &from) {
              ASSERT_EQ(a.id_, from);
              ASSERT_EQ(expected.key, key);
-             ASSERT_EQ(expected.valueA, nonstd::any_cast<std::string>(value));
+             ASSERT_EQ(expected.valueA, value.get<std::string>());
              ASSERT_EQ(expected.valueA, b.get_without_clock<std::string>(expected.key));
 
              a.on("changedByPeer", changed_by_peer_listener(
-                     [&](std::string &key, nonstd::any &value, const sb::from &from) {
+                     [&](std::string &key, nlohmann::json &value, const sb::from &from) {
                          ASSERT_EQ(b.id_, from);
                          ASSERT_EQ(expected.key, key);
-                         ASSERT_EQ(expected.valueB, nonstd::any_cast<std::string>(value));
+                         ASSERT_EQ(expected.valueB, value.get<std::string>());
                          ASSERT_EQ(expected.valueB, a.get_without_clock<std::string>(expected.key));
                      }));
              b.set(expected.key, expected.valueB);

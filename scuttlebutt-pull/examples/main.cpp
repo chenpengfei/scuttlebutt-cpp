@@ -11,7 +11,7 @@
 using namespace sb;
 
 void print_key_value(model model, const std::string &k) {
-    std::string v = nonstd::any_cast<std::string>(model.get_without_clock<std::string>(k));
+    auto v = model.get_without_clock<std::string>(k);
     spdlog::info("model id: {}, key: {}, value {}", model.id_, k, v);
 }
 

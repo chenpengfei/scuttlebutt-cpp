@@ -10,8 +10,8 @@ namespace sb {
         auto &blacklist = peer_accept.blacklist_;
         auto &whitelist = peer_accept.whitelist_;
 
-        auto data_any = std::get<update_items::Data>(u);
-        auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
+        auto &any = std::get<update_items::Data>(u);
+        auto data = any.get<std::pair<std::string, nlohmann::json>>();
         auto key = std::get<model_value_items::Key>(data);
 
         if (!blacklist.empty() &&
@@ -28,8 +28,8 @@ namespace sb {
     }
 
     bool model::apply_updates(const sb::update &u) {
-        auto data_any = std::get<update_items::Data>(u);
-        auto data = nonstd::any_cast<std::pair<std::string, nonstd::any>>(data_any);
+        auto &any = std::get<update_items::Data>(u);
+        auto data = any.get<std::pair<std::string, nlohmann::json>>();
         auto key = std::get<model_value_items::Key>(data);
 
         // ignore if we already have a more recent value

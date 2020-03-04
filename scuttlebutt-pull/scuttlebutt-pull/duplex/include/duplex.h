@@ -21,9 +21,13 @@ namespace sb {
     struct outgoing {
         std::string id_;
         sources clock_;
-        nonstd::any meta_;
+        nlohmann::json meta_;
         model_accept accept_;
     };
+
+    void to_json(nlohmann::json& j, const outgoing& o);
+
+    void from_json(const nlohmann::json& j, outgoing& o);
 
 class duplex final : public dp::duplex_pull {
     public:
@@ -93,7 +97,7 @@ class duplex final : public dp::duplex_pull {
 
         void drain();
 
-        void callback(dp::error end, const nonstd::any &data = nonstd::any()) {
+        void callback(dp::error end, const nlohmann::json &data = nlohmann::json()) {
             auto cb = cb_;
             if (end && on_close_) {
                 auto c = on_close_;
@@ -105,7 +109,7 @@ class duplex final : public dp::duplex_pull {
                 cb(end, data);
 
                 // fire this event when the payload has been read by downstream
-                if (data.type() == typeid(sb::update)) {
+                if (data.is_array()) {
                     // if payload is an update
                     ++sent_counter_;
                     emit("updateSent", (dp::duplex_pull *) this, data, sent_counter_,
@@ -170,7 +174,7 @@ class duplex final : public dp::duplex_pull {
 
         dp::sink &get_raw_sink();
 
-        void push(nonstd::any data, bool to_head = false) {
+        void push(nlohmann::json data, bool to_head = false) {
             if (dp::end_or_err(ended_)) { return; }
 
             // if sink already waiting,
@@ -210,13 +214,13 @@ class duplex final : public dp::duplex_pull {
         dp::error abort_ = dp::error::ok;
         bool sync_sent_ = false;
         bool sync_recv_ = false;
-        std::deque<nonstd::any> buffer_;
+        std::deque<nlohmann::json> buffer_;
         on_close on_close_ = nullptr;
         bool is_first_read_ = true;
         int sent_counter_ = 0; // update count that the stream has sent
         int received_counter_ = 0; // update count that the stream has received
         bool tail_ = true;
-        nonstd::any meta_;
+        nlohmann::json meta_;
         std::shared_ptr<debug> logger;
 
         sources peer_sources_;
