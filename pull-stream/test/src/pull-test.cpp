@@ -32,9 +32,9 @@ TEST(combinesSourceWithThrough, pull) {
 
     auto newVals = pull::pull(pull::pull(vals, timesTwo), timesTwo, timesFour);
 
-    newVals(false, [](bool done, auto val) {
+    newVals(dp::error::ok, [](dp::error done, auto val) {
         ASSERT_EQ(val, 16);
-        ASSERT_FALSE(done);
+        ASSERT_EQ(dp::error::ok, done);
     });
 }
 

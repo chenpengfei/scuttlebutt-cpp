@@ -23,10 +23,10 @@ void test_pull() {
     auto begin = vec.begin();
     auto end = vec.end();
     auto vals = pull::values(begin, end);
-    auto mapper = [&](int val){return val * 2;};
+    auto mapper = [&](int val) { return val * 2; };
     auto timesTwo = pull::Map<int>(mapper);
     auto timesFour = pipe_through(timesTwo, timesTwo);
-    auto logInt = [&] (auto read) { pull::log_with_looper<int>(read); };
+    auto logInt = [&](auto read) { pull::log_with_looper<int>(read); };
 
     auto newVals = pull::pull(vals, timesTwo, timesFour);
     auto newLogInt = pull::pipe_through(timesTwo, timesTwo, timesFour, logInt);
@@ -34,14 +34,14 @@ void test_pull() {
     const clock_t begin_time = clock();
 
     pull::pull(newVals,
-         timesTwo,
-         pipe_through(timesTwo, timesTwo),
-         timesFour,
-         timesTwo,
-         newLogInt);
+               timesTwo,
+               pipe_through(timesTwo, timesTwo),
+               timesFour,
+               timesTwo,
+               newLogInt);
 
     spdlog::info("test_pull_stream_with_condition_variable cost: {}ms",
-                 float( clock () - begin_time ) /  (CLOCKS_PER_SEC/1000));
+                 float(clock() - begin_time) / (CLOCKS_PER_SEC / 1000));
 }
 
 int main() {

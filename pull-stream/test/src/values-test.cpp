@@ -24,7 +24,7 @@ TEST(returnsSourceWhenNumArgsIsOne, pull) {
 
     auto newVals = pull::pull(vals);
 
-    vals(false, [](bool done, auto val) {
+    vals(dp::error::ok, [](bool done, auto val) {
         ASSERT_EQ(val, 1);
         ASSERT_FALSE(done);
     });
@@ -41,17 +41,17 @@ TEST(CanCallValues, values) {
 
     auto vals = values(begin, end);
 
-    vals(false, [](bool done, auto val) {
+    vals(dp::error::ok, [](bool done, auto val) {
         ASSERT_EQ(val, 1);
         ASSERT_FALSE(done);
     });
 
-    vals(false, [](bool done, auto val) {
+    vals(dp::error::ok, [](bool done, auto val) {
         ASSERT_EQ(val, 2);
         ASSERT_FALSE(done);
     });
 
-    vals(false, [](bool done, auto val) {
+    vals(dp::error::ok, [](bool done, auto val) {
         ASSERT_TRUE(done);
     });
 }
@@ -68,18 +68,18 @@ TEST(CanMapValues, Map) {
     auto timesTwo = Map<int>(mapper);
     auto doubled = timesTwo(vals);
 
-    doubled(false, [](bool done, auto val) {
+    doubled(dp::error::ok, [](dp::error done, auto val) {
         ASSERT_EQ(val, 2);
-        ASSERT_FALSE(done);
+        ASSERT_EQ(dp::error::ok, done);
     });
 
-    doubled(false, [](bool done, auto val) {
+    doubled(dp::error::ok, [](dp::error done, auto val) {
         ASSERT_EQ(val, 4);
-        ASSERT_FALSE(done);
+        ASSERT_EQ(dp::error::ok, done);
     });
 
-    doubled(false, [](bool done, auto val) {
-        ASSERT_TRUE(done);
+    doubled(dp::error::ok, [](dp::error done, auto val) {
+        ASSERT_EQ(dp::error::end, done);
     });
 }
 

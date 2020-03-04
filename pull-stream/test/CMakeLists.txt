@@ -12,7 +12,7 @@ set(PROJECT_NAME pull-stream-test)
 
 add_executable(${PROJECT_NAME} ${INCLUDES} ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} gtest gtest_main pull-looper)
+target_link_libraries(${PROJECT_NAME} gtest gtest_main pull-looper duplex-pull)
 
 if (${ENABLE_COVERAGE})
     target_link_libraries(${PROJECT_NAME} -fprofile-arcs -ftest-coverage)

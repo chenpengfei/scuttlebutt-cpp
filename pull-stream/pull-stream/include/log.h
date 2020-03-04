@@ -10,6 +10,7 @@
 #include <utility>
 #include "spdlog/spdlog.h"
 #include "pull-looper/include/pull_looper.h"
+#include "duplex-pull/include/duplex-pull.h"
 
 namespace pull {
 
@@ -30,8 +31,8 @@ namespace pull {
     decltype(auto) log_with_looper(R &&read) {
         pull::looper looper;
         std::function<void()> next = looper(std::function<void()>([&]() {
-            read(false, [&](bool done, T val) {
-                if (!done) {
+            read(dp::error::ok, [&](dp::error done, T val) {
+                if (dp::error::ok == done) {
                     spdlog::info(val);
                     next();
                 }

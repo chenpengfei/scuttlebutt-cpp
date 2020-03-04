@@ -5,30 +5,32 @@
 #ifndef SCUTTLEBUTT_SOURCE_H
 #define SCUTTLEBUTT_SOURCE_H
 
+#include "duplex-pull/include/duplex-pull.h"
+
 namespace pull {
 
     template<typename T>
     decltype(auto) values(T &begin, T &end) {
 
-        return [&begin, &end](bool abort, auto cb) {
+        return [&begin, &end](dp::error abort, auto cb) {
 
-            if (abort || (begin == end)) {
-                cb(true, -1);
+            if (dp::end_or_err(abort) || (begin == end)) {
+                cb(dp::error::end, 0);
             } else {
-                cb(false, *begin++);
+                cb(dp::error::ok, *begin++);
             }
         };
     }
 
-    template <typename T>
+    template<typename T>
     decltype(auto) values(T &value) {
 
-        return [&value](bool abort, auto cb) {
+        return [&value](dp::error abort, auto cb) {
 
-            if (abort || (value <= 0)) {
-                cb(true, -1);
+            if (dp::end_or_err(abort) || (value <= 0)) {
+                cb(dp::error::end, -1);
             } else {
-                cb(false, value--);
+                cb(dp::error::ok, value--);
             }
         };
     }

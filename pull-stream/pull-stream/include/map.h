@@ -11,13 +11,15 @@ namespace pull {
     decltype(auto) Map(M &&mapper) {
 
         return [&mapper](auto &&read) {
-            return [read, &mapper](bool abort, auto cb) {
-                read(abort, [&](bool end, T val) {
-                    bool ended = abort || end;
-                    if (ended)
-                        cb(true, val);
-                    else
-                        cb(false, mapper(val));
+            return [read, &mapper](dp::error abort, auto cb) {
+                read(abort, [&](dp::error end, T val) {
+                    dp::error ended = dp::end_or_err(abort) ? abort : end;
+
+                    if (dp::end_or_err(ended)) {
+                        cb(ended, val);
+                    } else {
+                        cb(dp::error::ok, mapper(val));
+                    }
                 });
             };
         };

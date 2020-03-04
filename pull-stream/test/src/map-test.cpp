@@ -28,7 +28,7 @@ TEST(combinesThroughWithThrough, pull) {
     auto timesFour = pipe_through(timesTwo, timesTwo);
     auto newVals = pull::pull(vals, timesFour);
 
-    newVals(false, [](bool done, auto val) {
+    newVals(dp::error::ok, [](bool done, auto val) {
         ASSERT_EQ(val, 4);
         ASSERT_FALSE(done);
     });
