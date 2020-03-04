@@ -13,6 +13,9 @@
 #include "event-emitter/include/event_emitter.h"
 #include "scuttlebutt.h"
 #include "pull-looper/include/pull_looper.h"
+#include "pull-stream/include/pull.h"
+#include "pull-split/include/pull-split.h"
+#include "pull-stringify/include/pull-stringify.h"
 
 namespace sb {
 
@@ -55,6 +58,10 @@ class duplex final : public dp::duplex_pull {
                 --(sb_->streams);
                 sb_->emit("unstream", sb_->streams);
             });
+
+            pull::pull_stringify_options pso;
+            pso.indent_ = -1;
+            json_serializer_ = pull::pull_stringify(pso);
         }
 
         void end() override {
@@ -66,7 +73,7 @@ class duplex final : public dp::duplex_pull {
                 if (wrapper_ == "raw") {
                     source_ = get_raw_source();
                 } else if (wrapper_ == "json") {
-                    source_ = get_raw_source();
+                    source_ = pull::pull(get_raw_source(), json_serializer_);
                 }
             }
             return source_;
@@ -77,7 +84,7 @@ class duplex final : public dp::duplex_pull {
                 if (wrapper_ == "raw") {
                     sink_ = get_raw_sink();
                 } else if (wrapper_ == "json") {
-                    sink_ = get_raw_sink();
+                    sink_ = pull::pipe_through(json_parser_, get_raw_sink());
                 }
             }
             return sink_;
@@ -97,7 +104,7 @@ class duplex final : public dp::duplex_pull {
 
         void drain();
 
-        void callback(dp::error end, const nlohmann::json &data = nlohmann::json()) {
+        void callback(dp::error end, const nlohmann::json &data = nlohmann::json("")) {
             auto cb = cb_;
             if (end && on_close_) {
                 auto c = on_close_;
@@ -226,6 +233,9 @@ class duplex final : public dp::duplex_pull {
         sources peer_sources_;
         model_accept peer_accept_;
         source_id peer_id_ = "";
+
+        pull::pull_stringify json_serializer_;
+        pull::pull_split json_parser_;
     };
 }
 

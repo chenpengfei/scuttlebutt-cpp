@@ -37,10 +37,7 @@ namespace sb {
                     self->is_first_read_ = false;
                     auto outgoing = self->get_outgoing();
                     self->push(outgoing, true);
-                    self->logger->info("sent 'outgoing': {} [{} {}]",
-                                       outgoing.id_,
-                                       outgoing.clock_.empty()? "" : outgoing.clock_.begin()->first,
-                                       outgoing.clock_.empty()? 0.0 : outgoing.clock_.begin()->second);//todo.outgoing
+                    self->logger->info("sent 'outgoing': {}", nlohmann::json(outgoing).dump());
                 }
 
                 self->cb_ = std::move(cb);

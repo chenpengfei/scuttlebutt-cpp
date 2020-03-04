@@ -43,6 +43,9 @@ include_directories(
         include
         pull-looper
         pull-stream
+        pull-split
+        pull-through
+        pull-stringify
         duplex-pull
         event-emitter
         event-loop
@@ -54,6 +57,8 @@ include_directories(
 
 add_subdirectory(pull-looper)
 add_subdirectory(pull-stream)
+add_subdirectory(pull-through)
+add_subdirectory(pull-split)
 add_subdirectory(duplex-pull)
 add_subdirectory(event-emitter)
 add_subdirectory(event-loop)
