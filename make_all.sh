@@ -40,7 +40,7 @@ fi
 
 # Make
 cmake ${CMAKE_VARS} ../
-make
+make -j 4
 
 # Run Test
 ./pull-stream/test/pull-stream-test
