@@ -18,7 +18,7 @@ namespace pull {
     public:
         virtual ~pull_split() = default;
 
-        pull_split(const std::string &matcher = "\n",
+        pull_split(const std::string &matcher = "\n|$",
                    mapper mapper = nullptr,
                    bool reverse = false,
                    bool last = false) :
@@ -29,7 +29,6 @@ namespace pull {
                 std::vector<std::string> pieces{
                         std::sregex_token_iterator(s.begin(), s.end(), self->matcher_, -1), {}
                 };
-                pieces.push_back("");//todo
                 self->so_far_ = self->reverse_ ? pieces.front() : pieces.back();
                 auto l = pieces.size();
                 for (auto i = 0; i < l - 1; ++i) {
