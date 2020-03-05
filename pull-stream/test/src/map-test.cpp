@@ -28,14 +28,17 @@ TEST(combinesThroughWithThrough, pull) {
     auto timesFour = pipe_through(timesTwo, timesTwo);
     auto newVals = pull::pull(vals, timesFour);
 
-    newVals(dp::error::ok, [](bool done, auto val) {
+    newVals(dp::error::ok, [](dp::error done, auto val) {
         ASSERT_EQ(val, 4);
-        ASSERT_FALSE(done);
+        ASSERT_TRUE(dp::error::ok == done);
     });
 
-    //todo
-//    newVals(false, [](bool done, auto val){
-//        ASSERT_EQ(val, 8);
-//        ASSERT_TRUE(done);
-//    });
+    newVals(dp::error::ok, [](dp::error done, auto val) {
+        ASSERT_EQ(val, 8);
+        ASSERT_TRUE(dp::error::ok == done);
+    });
+
+    newVals(dp::error::ok, [](dp::error done, auto val) {
+        ASSERT_TRUE(dp::error::end == done);
+    });
 }
