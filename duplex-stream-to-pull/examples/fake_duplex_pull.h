@@ -5,11 +5,13 @@
 #ifndef SCUTTLEBUTT_FAKE_DUPLEX_PULL_H
 #define SCUTTLEBUTT_FAKE_DUPLEX_PULL_H
 
+#include "nlohmann/json.hpp"
+
 const size_t MAX_BUFFER_SIZE = 1024;
 
 class fake_duplex_pull : public dp::duplex_pull {
 public:
-    void callback(dp::error end, const nonstd::any &data) {
+    void callback(dp::error end, const nlohmann::json &data) {
         if (cb_) {
             auto _cb = cb_;
             cb_ = nullptr;
@@ -54,14 +56,14 @@ public:
             decltype(auto) self = this;
             raw_sink_ = [self](dp::read read) {
                 self->peer_read_ = std::move(read);
-                self->more_ = [self](dp::error end, const nonstd::any &u) {
+                self->more_ = [self](dp::error end, const nlohmann::json &u) {
                     if (dp::end_or_err(end)) {
                         spdlog::info("sink reading end or error, {}", end);
                         self->end();
                         return;
                     }
 
-                    auto data = nonstd::any_cast<std::string>(u);
+                    auto data = u.get<std::string>();
                     strncpy(self->w_buffer_, data.c_str(), data.length());
                     self->w_buffer_len_ += data.length();
 

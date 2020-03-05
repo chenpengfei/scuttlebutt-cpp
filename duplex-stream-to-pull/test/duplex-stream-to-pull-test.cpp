@@ -35,8 +35,8 @@ TEST(read_data_from_stream, duplex_stream_to_pull) {
 
     int counter = 0;
 
-    auto cb = dp::source_callback([&counter](dp::error, const nonstd::any &data) {
-        std::string str = nonstd::any_cast<std::string>(data);
+    auto cb = dp::source_callback([&counter](dp::error, const nlohmann::json &data) {
+        std::string str = data.get<std::string>();
         ASSERT_EQ("1", str);
         ++counter;
     });

@@ -63,7 +63,7 @@ dp::sink &duplex_stream_to_pull::sink() {
     if (!raw_sink_) {
         decltype(auto) self = this;
 
-        w_done_ = [self](dp::error, const nonstd::any &) {
+        w_done_ = [self](dp::error, const nlohmann::json &) {
             if (self->w_did_) { return; }
             self->w_did_ = true;
             if (self->w_end_cb_ != nullptr) {
@@ -101,7 +101,7 @@ dp::sink &duplex_stream_to_pull::sink() {
 
         raw_sink_ = [self](dp::read read) {
             self->peer_read_ = std::move(read);
-            self->more_ = [self](dp::error end, const nonstd::any &u) {
+            self->more_ = [self](dp::error end, const nlohmann::json &u) {
                 self->w_ended_ = dp::end_or_err(self->w_ended_) ? self->w_ended_ : end;
 
                 if (self->w_ended_ == dp::error::end) {
@@ -113,7 +113,7 @@ dp::sink &duplex_stream_to_pull::sink() {
                     return self->w_done_(self->w_ended_, nullptr);
                 }
 
-                auto data = nonstd::any_cast<std::string>(u);
+                auto data = u.get<std::string>();
                 bool pause = self->stream_->write(data.c_str(), data.length());
                 if (!pause) {
                     self->stream_->once("drain", self->looper_next_);
