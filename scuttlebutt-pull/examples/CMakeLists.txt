@@ -11,7 +11,7 @@ set(SPDLOG_LEVEL_WARN 3)
 set(SPDLOG_LEVEL_ERROR 4)
 set(SPDLOG_LEVEL_CRITICAL 5)
 set(SPDLOG_LEVEL_OFF 6)
-add_compile_definitions(SPDLOG_ACTIVE_LEVEL=${SPDLOG_LEVEL_DEBUG})
+add_definitions(-DSPDLOG_ACTIVE_LEVEL=${SPDLOG_LEVEL_DEBUG})
 
 set(PROJECT_NAME scuttlebutt-pull-examples)
 
