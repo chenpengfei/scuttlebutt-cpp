@@ -18,6 +18,10 @@ void print_key_value(model model, const std::string &k) {
 int main() {
     srand(time(nullptr));
 
+#ifdef SPDLOG_ACTIVE_LEVEL
+    spdlog::set_level(spdlog::level::level_enum(SPDLOG_ACTIVE_LEVEL));
+#endif
+
     model a(scuttlebutt_options("A"));
     model b(scuttlebutt_options("B"));
 

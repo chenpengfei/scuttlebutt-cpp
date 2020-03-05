@@ -13,15 +13,26 @@ const auto default_logger = debug::create("sb");
 namespace sb {
 
     void to_json(nlohmann::json& j, const model_accept& m) {
-        j = nlohmann::json{
-                {"whitelist",     m.whitelist_},
-                {"blacklist",  m.blacklist_},
-        };
+        j = nlohmann::json{};
+        if (!m.whitelist_.empty()) {
+            j["whitelist"] = m.whitelist_;
+        }
+        if (!m.blacklist_.empty()) {
+            j["blacklist"] = m.blacklist_;
+        }
     }
 
     void from_json(const nlohmann::json& j, model_accept& m) {
-        j.at("whitelist").get_to(m.whitelist_);
-        j.at("blacklist").get_to(m.blacklist_);
+        try {
+            j.at("whitelist").get_to(m.whitelist_);
+        } catch (nlohmann::json::out_of_range& e) {
+            spdlog::trace(e.what());
+        }
+        try {
+            j.at("blacklist").get_to(m.blacklist_);
+        } catch (nlohmann::json::out_of_range& e) {
+            spdlog::trace(e.what());
+        }
     }
 
     scuttlebutt::scuttlebutt(scuttlebutt_options opts)
@@ -121,5 +132,9 @@ namespace sb {
         opts.writable_ = false;
         opts.readable_ = true;
         return create_stream(opts);
+    }
+
+    bool model_accept::empty() const {
+        return blacklist_.empty() && whitelist_.empty();
     }
 }

@@ -33,6 +33,7 @@ namespace sb {
     };
 
     struct model_accept {
+        bool empty() const;
         std::vector<std::string> whitelist_;
         std::vector<std::string> blacklist_;
     };
