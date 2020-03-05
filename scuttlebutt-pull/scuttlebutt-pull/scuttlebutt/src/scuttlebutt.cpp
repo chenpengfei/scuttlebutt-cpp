@@ -57,7 +57,7 @@ namespace sb {
         }
 
         sources_[source_id] = ts;
-        logger->info("update our sources to {} {}", source_id, ts);//todo.sources_
+        logger->info("update our sources to {}", nlohmann::json(sources_).dump());
 
         auto did_verification = [this, &update](bool verified) {
             // I'm not sure how what should happen if a async verification

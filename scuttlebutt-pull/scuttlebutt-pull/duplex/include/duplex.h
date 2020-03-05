@@ -133,7 +133,7 @@ class duplex final : public dp::duplex_pull {
         std::function<void(sb::update &)> &get_on_update() {
             if (on_update_ == nullptr) {
                 on_update_ = [this](sb::update update) {
-                    logger->info("got 'update on stream: {}", "update");//todo
+                    logger->info("got 'update on stream: {}", nlohmann::json(update).dump());
 
                     // current stream is in write-only mode
                     if (!readable_) {
@@ -152,26 +152,26 @@ class duplex final : public dp::duplex_pull {
 
                         // now we know that our peer has the latest knowledge of UpdateItems.From at time "UpdateItems.Timestamp"
                         peer_sources_[source] = ts;
-                        logger->info("updated peerSources to", "peer_sources_");//todo
+                        logger->info("updated peerSources to", nlohmann::json(peer_sources_).dump());
                         return;
                     }
 
                     bool is_accepted = sb_->is_accepted(peer_accept_, update);
 
                     if (!is_accepted) {
-                        logger->info("'update ignored by peerAccept: {} {}", "update",
-                                     "peer_accept_");//todo
+                        logger->info("'update ignored by peerAccept: {} {}",
+                                nlohmann::json(update).dump(),nlohmann::json(peer_accept_).dump());
                         return;
                     }
 
                     // send 'scuttlebutt' to peer
                     std::get<update_items::From>(update) = sb_->id_;
                     push(update);
-                    logger->info("sent 'update' to peer: {}", "update");//todo
+                    logger->info("sent 'update' to peer: {}", nlohmann::json(update).dump());
 
                     // really, this should happen before emitting.
                     peer_sources_[source] = ts;
-                    logger->info("updated peerSources to", "peer_sources_");//todo
+                    logger->info("updated peerSources to", nlohmann::json(peer_sources_).dump());
                 };
             }
             return on_update_;

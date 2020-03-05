@@ -149,10 +149,7 @@ namespace sb {
     }
 
     void duplex::start(const outgoing &incoming) {
-        logger->info("start with data: {} [{} {}]",
-                     incoming.id_,
-                     incoming.clock_.empty()? "" : incoming.clock_.begin()->first,
-                     incoming.clock_.empty()? 0.0 : incoming.clock_.begin()->second);//todo
+        logger->info("start with data: {}", nlohmann::json(incoming).dump());
 
         peer_sources_ = incoming.clock_;
         peer_id_ = incoming.id_;
