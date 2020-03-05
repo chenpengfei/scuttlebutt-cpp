@@ -18,6 +18,7 @@ namespace pull {
     public:
         virtual ~pull_split() = default;
 
+        // std::regex ws_re(R"(\n|($(?!\s)))"); may be better.todo
         pull_split(const std::string &matcher = "\n|$",
                    mapper mapper = nullptr,
                    bool reverse = false,
