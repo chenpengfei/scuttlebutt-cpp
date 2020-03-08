@@ -59,12 +59,8 @@ public:
      * While calling write() on a stream that is not draining is allowed,
      * stream will buffer all written chunks until maximum memory usage occurs,
      * at which point it will abort unconditionally.
-     *
-     * @param buffer[in] data
-     * @param buffer_len[in] data length
-     * @return false, should not write chunks again; true, can write chunks repeatedly
      */
-    virtual bool write(const char *buffer, size_t buffer_len) = 0;
+    virtual bool write(const std::string &data) = 0;
 
     /**
      * The stream.read() method pulls some data out of the internal buffer and returns it.
@@ -73,12 +69,8 @@ public:
      * Only after readable.read() returns null, 'readable' will be emitted.
      * Calling stream.read() after the 'end' event has been emitted will return 0.
      * No runtime error will be raised.
-     *
-     * @param buffer
-     * @param buffer_len
-     * @return
      */
-    virtual size_t read(char *buffer, size_t buffer_len) = 0;
+    virtual std::string read() = 0;
 
     /**
      * Calling the stream.end() method signals that no more data will be written to the stream.
@@ -101,6 +93,7 @@ public:
      */
     void destroy() {
         _destroy();
+        //todo.do something
     }
 
 protected:
@@ -132,10 +125,6 @@ protected:
 // 'finish' ->
 // The 'finish' event is emitted after the stream.end() method has been called,
 // and all data has been flushed to the underlying system.
-//
-// 'end' ->
-// The 'end' event is emitted when there is no more data to be consumed from the stream.
-// The 'end' event will not be emitted unless the data is completely consumed.
 //
 // 'readable' ->
 // The 'readable' event is emitted when there is data available to be read from the stream.
