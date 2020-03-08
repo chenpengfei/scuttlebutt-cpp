@@ -6,7 +6,7 @@
 #define SCUTTLEBUTT_MODEL_H
 
 #include <iostream>
-#include "scuttlebutt.h"
+#include "scuttlebutt-pull/scuttlebutt/include/scuttlebutt.h"
 
 namespace sb {
 
