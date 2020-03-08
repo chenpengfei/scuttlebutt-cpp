@@ -16,12 +16,9 @@ class mock_duplex_stream : public duplex_stream {
 public:
     mock_duplex_stream(size_t high_water_mark) : duplex_stream(high_water_mark) {}
 
-    MOCK_METHOD2(write, bool(
-            const char *buffer, size_t
-            buffer_len));
+    MOCK_METHOD1(write, bool(const std::string &));
 
-    MOCK_METHOD2(read, size_t(char * buffer, size_t
-            buffer_len));
+    MOCK_METHOD0(read, std::string());
 
     MOCK_METHOD0(end, void());
 
@@ -46,10 +43,9 @@ TEST(read_data_from_stream, duplex_stream_to_pull) {
     });
 
     char buffer_[3] = {'1', '2', '3'};
-    EXPECT_CALL(*mock_stream, read(_, _)).WillOnce(Invoke(
-            [&buffer_](char *buffer, size_t buffer_len) {
-                strncpy(buffer, buffer_, 1);
-                return 1;
+    EXPECT_CALL(*mock_stream, read()).WillOnce(Invoke(
+            [&buffer_]() {
+                return buffer_[0];
             }));
 
     mock_stream->emit("readable");
@@ -65,27 +61,25 @@ TEST(source_to_sink, duplex_stream_to_pull) {
     std::shared_ptr<dp::duplex_pull> s1 = std::make_shared<duplex_stream_to_pull>(ds);
 
     char r_buffer_[3] = {'1', '2', '3'};
-    EXPECT_CALL(*mock_stream, read(_, _))
+    EXPECT_CALL(*mock_stream, read())
             .Times(3)
-            .WillOnce(Invoke([&r_buffer_](char *buffer, size_t buffer_len) {
-                strncpy(buffer, r_buffer_, 1);
-                return 1;
+            .WillOnce(Invoke([&r_buffer_]() {
+                return r_buffer_[0];
             }))
-            .WillOnce(Invoke([&r_buffer_](char *buffer, size_t buffer_len) {
-                strncpy(buffer, r_buffer_ + 1, 2);
-                return 2;
+            .WillOnce(Invoke([&r_buffer_]() {
+                return std::string(&r_buffer_[1], 2);
             }))
-            .WillOnce(Invoke([&r_buffer_](char *buffer, size_t buffer_len) {
-                return 0;
+            .WillOnce(Invoke([&r_buffer_]() {
+                return std::string();
             }));
 
     char w_buffer_[3];
     size_t w_len = 0;
-    EXPECT_CALL(*mock_stream, write(_, _))
+    EXPECT_CALL(*mock_stream, write(_))
             .Times(2)
-            .WillRepeatedly(Invoke([&w_buffer_, &w_len](const char *buffer, size_t buffer_len) {
-                strncpy(w_buffer_ + w_len, buffer, buffer_len);
-                w_len += buffer_len;
+            .WillRepeatedly(Invoke([&w_buffer_, &w_len](const std::string &data) {
+                strncpy(w_buffer_ + w_len, data.c_str(), data.length());
+                w_len += data.length();
                 return true;
             }));
 

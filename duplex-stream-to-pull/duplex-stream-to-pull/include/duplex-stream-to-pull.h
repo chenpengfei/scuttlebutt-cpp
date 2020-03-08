@@ -11,8 +11,6 @@
 #include "duplex-stream/include/duplex-stream.h"
 #include "pull-looper/include/pull_looper.h"
 
-const size_t MAX_READ_SIZE = (32 * 1024);
-
 class duplex_stream_to_pull : public dp::duplex_pull {
 public:
     ~duplex_stream_to_pull() override = default;
@@ -56,8 +54,6 @@ private:
     std::function<void()> r_on_readable_ = nullptr;
     std::function<void()> r_on_end_ = nullptr;
     std::function<void(dp::error)> r_on_error_ = nullptr;
-
-    char r_buffer_[MAX_READ_SIZE]{};
 
     dp::read raw_source_ = nullptr;
 };

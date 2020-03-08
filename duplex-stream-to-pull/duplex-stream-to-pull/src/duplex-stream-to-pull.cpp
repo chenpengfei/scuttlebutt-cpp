@@ -8,17 +8,17 @@ duplex_stream_to_pull::duplex_stream_to_pull(std::shared_ptr<duplex_stream> stre
                                              std::function<void(dp::error)> cb)
         : stream_(std::move(stream)), w_end_cb_(std::move(cb)) {
     r_read_ = [this]() {
-        auto size = stream_->read(r_buffer_, MAX_READ_SIZE);
-        if (size != 0 && r_cb_ != nullptr) {
+        std::string data = stream_->read();
+        if (!data.empty() && r_cb_) {
             auto cb = r_cb_;
             r_cb_ = nullptr;
-            std::string data(r_buffer_, size);
             cb(dp::error::ok, data);
         }
     };
 
     r_on_readable_ = [this]() {
         r_waiting_ = true;
+
         if (r_cb_) {
             r_read_();
         }
@@ -47,10 +47,10 @@ dp::read &duplex_stream_to_pull::source() {
     if (!raw_source_) {
         decltype(auto) self = this;
 
-        raw_source_ = [self](dp::error abort, const dp::source_callback& cb) {
-            self->r_cb_ = cb;
+        raw_source_ = [self](dp::error abort, dp::source_callback cb) {
+            self->r_cb_ = std::move(cb);
             if (dp::end_or_err(self->r_ended_)) {
-                cb(self->r_ended_, nullptr);
+                self->r_cb_(self->r_ended_, nullptr);
             } else if (self->r_waiting_) {
                 self->r_read_();
             }
@@ -101,6 +101,11 @@ dp::sink &duplex_stream_to_pull::sink() {
 
         raw_sink_ = [self](dp::read read) {
             self->peer_read_ = std::move(read);
+
+            self->looper_next_ = self->looper_(std::function<void()>([self]() {
+                self->peer_read_(dp::error::ok, self->more_);
+            }));
+
             self->more_ = [self](dp::error end, const nlohmann::json &u) {
                 self->w_ended_ = dp::end_or_err(self->w_ended_) ? self->w_ended_ : end;
 
@@ -114,17 +119,13 @@ dp::sink &duplex_stream_to_pull::sink() {
                 }
 
                 auto data = u.get<std::string>();
-                bool pause = self->stream_->write(data.c_str(), data.length());
+                bool pause = self->stream_->write(data);
                 if (!pause) {
                     self->stream_->once("drain", self->looper_next_);
                 } else {
                     self->looper_next_();
                 }
             };
-
-            self->looper_next_ = self->looper_(std::function<void()>([self]() {
-                self->peer_read_(dp::error::ok, self->more_);
-            }));
 
             self->looper_next_();
         };

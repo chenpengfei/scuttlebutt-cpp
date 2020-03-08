@@ -27,8 +27,9 @@ public:
             // we'd like to end and there is no left items to be sent
             callback(ended_, nullptr);
         } else if (r_buffer_len_ > 0) {
-            callback(dp::error::ok,std::string(r_buffer_, r_buffer_len_));
+            auto data = std::string(r_buffer_, r_buffer_len_);
             r_buffer_len_ = 0;
+            callback(dp::error::ok, data);
         }
     }
 
@@ -101,7 +102,7 @@ public:
         }
         auto len = total_len - r_buffer_len_;
 
-        strncpy(r_buffer_, buffer, len);
+        strncpy(r_buffer_ + r_buffer_len_, buffer, len);
         r_buffer_len_ = total_len;
 
         drain();

@@ -11,25 +11,24 @@ public:
 
     }
 
-    bool write(const char *buffer, size_t buffer_len) override {
-        auto total_len = w_buffer_len_ + buffer_len;
+    bool write(const std::string &data) override {
+        auto total_len = w_buffer_len_ + data.length();
         if (total_len >= MAX_BUFFER_SIZE) {
             // stream will buffer all written chunks until maximum memory usage occurs,
             // at which point it will abort unconditionally
             return false;
         }
 
-        strncpy(w_buffer_, buffer, buffer_len);
+        strncpy(w_buffer_, data.c_str(), data.length());
         w_buffer_len_ = total_len;
 
         return total_len < high_water_mark_;
     }
 
-    size_t read(char *buffer, size_t buffer_len) override {
-        auto len = buffer_len <= r_buffer_len_ ? buffer_len : r_buffer_len_;
-        strncpy(buffer, r_buffer_, len);
-        r_buffer_len_ -= len;
-        return len;
+    std::string read() override {
+        auto len = r_buffer_len_;
+        r_buffer_len_ = 0;
+        return std::string(r_buffer_, len);
     }
 
     void _destroy() override {
