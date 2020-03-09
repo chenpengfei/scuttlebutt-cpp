@@ -28,10 +28,6 @@ namespace sb {
         model_accept accept_;
     };
 
-    void to_json(nlohmann::json& j, const outgoing& o);
-
-    void from_json(const nlohmann::json& j, outgoing& o);
-
 class duplex final : public dp::duplex_pull {
     public:
         duplex(scuttlebutt *sb, const stream_options &opts)
@@ -237,6 +233,11 @@ class duplex final : public dp::duplex_pull {
         pull::pull_stringify json_serializer_;
         pull::pull_split json_parser_;
     };
-}
+} // namespace sb
+
+namespace sb {
+    void to_json(nlohmann::json& j, const outgoing& o);
+    void from_json(const nlohmann::json& j, outgoing& o);
+} // namespace sb
 
 #endif //SCUTTLEBUTT_DUPLEX_H

@@ -6,8 +6,10 @@ include_directories(
 
 add_library(scuttlebutt-pull
         duplex/src/duplex.cpp
+        duplex/src/json.cpp
         model/src/model.cpp
         scuttlebutt/src/scuttlebutt.cpp
+        scuttlebutt/src/json.cpp
         scuttlebutt/src/utils.cpp)
 
 target_link_libraries(scuttlebutt-pull pull-looper duplex-pull monotonic-timestamp)

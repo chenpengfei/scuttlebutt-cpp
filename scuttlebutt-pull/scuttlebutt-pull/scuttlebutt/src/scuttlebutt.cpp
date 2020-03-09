@@ -12,29 +12,6 @@ const auto default_logger = debug::create("sb");
 
 namespace sb {
 
-    void to_json(nlohmann::json& j, const model_accept& m) {
-        j = nlohmann::json{};
-        if (!m.whitelist_.empty()) {
-            j["whitelist"] = m.whitelist_;
-        }
-        if (!m.blacklist_.empty()) {
-            j["blacklist"] = m.blacklist_;
-        }
-    }
-
-    void from_json(const nlohmann::json& j, model_accept& m) {
-        try {
-            j.at("whitelist").get_to(m.whitelist_);
-        } catch (nlohmann::json::out_of_range& e) {
-            spdlog::trace(e.what());
-        }
-        try {
-            j.at("blacklist").get_to(m.blacklist_);
-        } catch (nlohmann::json::out_of_range& e) {
-            spdlog::trace(e.what());
-        }
-    }
-
     scuttlebutt::scuttlebutt(scuttlebutt_options opts)
             : accept_(opts.accept_) {
         auto id = opts.id_;

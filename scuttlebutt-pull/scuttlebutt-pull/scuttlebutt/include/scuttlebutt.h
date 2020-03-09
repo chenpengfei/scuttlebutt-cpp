@@ -14,7 +14,6 @@
 #include "event-emitter/include/event_emitter.h"
 #include "duplex-pull/include/duplex-pull.h"
 #include "util.h"
-#include "nlohmann/json.hpp"
 
 namespace sb {
 
@@ -37,10 +36,6 @@ namespace sb {
         std::vector<std::string> whitelist_;
         std::vector<std::string> blacklist_;
     };
-
-    void to_json(nlohmann::json& j, const model_accept& m);
-
-    void from_json(const nlohmann::json& j, model_accept& m);
 
     struct scuttlebutt_options {
         scuttlebutt_options(std::string id = "") : id_(id) {}
@@ -143,5 +138,17 @@ namespace sb {
         std::shared_ptr<debug> logger;
     };
 } // namespace sb
+
+namespace sb {
+
+    void to_json(nlohmann::json& j, const model_accept& m);
+    void from_json(const nlohmann::json& j, model_accept& m);
+} // namespace sb
+
+namespace std {
+
+    void to_json(nlohmann::json& j, const sb::update& u);
+    void from_json(const nlohmann::json& j, sb::update& p);
+} // namespace std
 
 #endif //SCUTTLEBUTT_SCUTTLEBUTT_H
