@@ -53,6 +53,7 @@ include_directories(
         scuttlebutt-pull
         duplex-stream
         duplex-stream-to-pull
+        circular-buffer
 )
 
 add_subdirectory(pull-looper)
@@ -67,5 +68,7 @@ add_subdirectory(scuttlebutt-pull)
 add_subdirectory(duplex-stream)
 add_subdirectory(duplex-stream-to-pull)
 add_subdirectory(pull-stringify)
+add_subdirectory(circular-buffer)
+add_subdirectory(socket-stream)
 
 
