@@ -18,10 +18,11 @@ namespace sb {
         }
 
         model &set(const std::string &k, const std::string &v) {
+            el::PUSH(el::handler([this, k, v](){
+                logger->info("set: k:({}) v({})", k, v);
+                local_update(std::make_pair(k, v));
+            }));
 
-            logger->info("set: k:({}) v({})", k, v);
-
-            local_update(std::make_pair(k, v));
             return *this;
         }
 

@@ -21,7 +21,7 @@ namespace sb {
     bool _filter(const sb::update &update, const sb::sources &sources) {
         // update in local store
         auto ts = std::get<sb::update_items::Timestamp>(update);
-        auto source_id = std::get<sb::update_items::SourceId>(update);
+        const auto& source_id = std::get<sb::update_items::SourceId>(update);
 
         auto it = sources.find(source_id);
         return it == sources.end() ? true : it->second < ts;

@@ -27,7 +27,7 @@ namespace std {
         std::get<update_items::SourceId>(p) = j.at(update_items::SourceId);
 
         try {
-            j.at(update_items::SourceId).get_to(std::get<update_items::SourceId>(p));
+            j.at(update_items::From).get_to(std::get<update_items::From>(p));
         } catch (nlohmann::json::out_of_range& e) {
             spdlog::trace(e.what());
         }

@@ -12,4 +12,8 @@ add_library(scuttlebutt-pull
         scuttlebutt/src/json.cpp
         scuttlebutt/src/utils.cpp)
 
-target_link_libraries(scuttlebutt-pull pull-looper duplex-pull monotonic-timestamp)
+target_link_libraries(scuttlebutt-pull
+        event-loop
+        pull-looper
+        duplex-pull
+        monotonic-timestamp)
