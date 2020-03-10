@@ -40,8 +40,8 @@ public:
     static spdlog::string_view_t last_logger_name_;
 
 private:
-    const std::string pattern_ = "[%^%L%$] %-10n %v";
-    const std::string pattern_without_logger_name_ = "[%^%L%$]            %v";
+    const std::string pattern_ = "[%^%L%$][%t] %-10n %v";
+    const std::string pattern_without_logger_name_ = "[%^%L%$][%t]            %v";
 };
 
 template<class Mutex>
