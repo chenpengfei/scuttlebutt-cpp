@@ -10,6 +10,7 @@
 #include "pull-split/include/pull-split.h"
 #include "pull-through/include/pull-through.h"
 #include "pull-stream/include/pull.h"
+#include "event-loop/include/event-loop.h"
 
 const size_t MAX_BUFFER_SIZE = 100 * 1024;
 
@@ -37,7 +38,8 @@ public:
         } else if (!buffer_.empty()) {
             std::string data = buffer_.front();
             buffer_.pop();
-            spdlog::info("fake stream callback data {}", data);
+            //todo
+            //spdlog::info("fake stream callback data {}", data);
             callback(dp::error::ok, data);
         }
     }
@@ -106,12 +108,13 @@ public:
     }
 
 public:
-    void push(const char *buffer, size_t buffer_len) {
-        buffer_.emplace(buffer, buffer_len);
-
-        spdlog::info("push data to fake stream: {}", std::string(buffer, buffer_len));
-
-        drain();
+    void push(const std::string& data) {
+        el::PUSH(el::handler([this, data](){
+            buffer_.push(data);
+            //todo
+            //spdlog::info("push data to fake stream: {}", data);
+            drain();
+        }));
     }
 
 private:

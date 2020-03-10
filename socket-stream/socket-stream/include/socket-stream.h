@@ -21,6 +21,7 @@
 #include "duplex-stream/include/duplex-stream.h"
 #include "circular-buffer/include/circular-buffer.h"
 #include "duplex-pull/include/duplex-pull.h"
+#include "event-loop/include/event-loop.h"
 
 class socket_stream final : public duplex_stream {
 public:
@@ -30,35 +31,31 @@ public:
               w_circle_(high_water_mark),
               end_(false),
               waiting_(true),
+              draining_(true),
               closed_(false) {
 
     }
 
     bool write(const std::string &data) override {
-        //todo
-        send_all(socket_fd_, data.c_str(), data.length());
-
-        return true;
-
         if (end_) {
             throw "end";
         }
 
         // abort, not override exist data
         if (w_circle_.full()) {
+            draining_ = false;
             return false;
         }
 
         // todo.optimize
         {
             std::lock_guard<std::mutex> lk(w_mutex_);
-            //todo
-            //spdlog::info("socket stream, write buffer:-----> {}", data);
             w_circle_.put(data);
             w_cv_.notify_one();
         }
 
         if (w_circle_.full()) {
+            draining_ = false;
             return false;
         }
 
@@ -79,8 +76,7 @@ public:
         std::lock_guard<std::mutex> lk(r_mutex_);
         auto data = r_circle_.get();
         r_cv_.notify_one();
-        //todo
-        //spdlog::info("buffer read:-----> {}", data);
+
         return data;
     }
 
@@ -144,8 +140,7 @@ public:
         freeaddrinfo(server_info);
 
         r_thread_ = std::make_unique<std::thread>(&socket_stream::read_thread, this);
-        //todo
-//        w_thread_ = std::make_unique<std::thread>(&socket_stream::write_thread, this);
+        w_thread_ = std::make_unique<std::thread>(&socket_stream::write_thread, this);
 
         return 0;
     }
@@ -178,20 +173,18 @@ private:
                         // Connection closed
                         spdlog::error("socket({}) hung up", poll_fd.fd);
                     } else {
-                        spdlog::error("recv");
+                        spdlog::error("socket recv");
                     }
                     break;
                 } else {
                     auto data = std::string(r_buffer_, bytes);
-                    //todo
-                    //spdlog::info("------> socket stream, read from socket:-----> {}", data);
                     r_circle_.put(data);
                     //todo
                     if (waiting_) {
                         waiting_ = false;
-                        //todo
-                        //spdlog::info("------> socket stream notify fake stream readable");
-                        emit("readable");
+                        el::PUSH(el::handler([this](){
+                            emit("readable");
+                        }));
                     }
                 }
             }
@@ -203,19 +196,22 @@ private:
     void write_thread() {
         while (!end_) {
             if (w_circle_.empty()) {
-                //todo
-                //spdlog::info("--------> notify fake stream drain");
-                emit("drain");
-                {
-                    std::unique_lock<std::mutex> lk(w_mutex_);
-                    w_cv_.wait(lk, [this] { return !w_circle_.empty(); });
-                }
+                el::PUSH(el::handler([this](){
+                    if (!draining_ && w_circle_.empty()) {
+                        draining_ = true;
+                        emit("drain");
+                    }
+                }));
+            }
+
+            {
+                std::unique_lock<std::mutex> lk(w_mutex_);
+                w_cv_.wait(lk, [this] { return !w_circle_.empty(); });
             }
 
             auto chunk = w_circle_.get();
-            //todo
-            //spdlog::info("socket stream write:-----> {}", chunk);
             if (send_all(socket_fd_, chunk.c_str(), chunk.length()) == -1) {
+                spdlog::error("socket send");
                 break;
             }
         }
@@ -269,8 +265,9 @@ private:
 
     std::atomic<bool> end_;
 
-    static const size_t READ_CHUNK_SIZE = 4 * 1024;
-    char r_buffer_[READ_CHUNK_SIZE];
+    static const size_t BUFFER_SIZE = 4 * 1024;
+    char r_buffer_[BUFFER_SIZE];
+    char w_buffer_[BUFFER_SIZE];
 
     std::unique_ptr<std::thread> r_thread_ = nullptr;
     circular_buffer<std::string> r_circle_;
@@ -282,6 +279,8 @@ private:
     circular_buffer<std::string> w_circle_;
     std::mutex w_mutex_;
     std::condition_variable w_cv_;
+    std::atomic<bool> draining_;
+
 
     std::atomic<bool> closed_;
 };
