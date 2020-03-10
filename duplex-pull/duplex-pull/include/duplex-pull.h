@@ -56,7 +56,7 @@ namespace dp {
 
     void link(duplex_pull *a, duplex_pull *b);
 
-    void link(const std::unique_ptr<duplex_pull> &a, const std::unique_ptr<duplex_pull> &b);
+    void link(const std::shared_ptr<duplex_pull> &a, const std::shared_ptr<duplex_pull> &b);
 }
 
 #endif //SCUTTLEBUTT_DUPLEX_PULL_H

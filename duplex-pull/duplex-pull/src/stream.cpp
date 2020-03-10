@@ -4,6 +4,7 @@
 
 #include "duplex-pull.h"
 #include "pull-stream/include/pull.h"
+#include "event-loop/include/event-loop.h"
 
 namespace dp {
 
@@ -12,12 +13,16 @@ namespace dp {
     }
 
     void link(duplex_pull *a, duplex_pull *b) {
-        pull::pull(a->source(), b->sink());
-        pull::pull(b->source(), a->sink());
+        el::PUSH(el::handler([a, b](){
+            pull::pull(a->source(), b->sink());
+            pull::pull(b->source(), a->sink());
+        }));
     }
 
-    void link(const std::unique_ptr<duplex_pull> &a, const std::unique_ptr<duplex_pull> &b) {
-        pull::pull(a->source(), b->sink());
-        pull::pull(b->source(), a->sink());
+    void link(const std::shared_ptr<duplex_pull> &a, const std::shared_ptr<duplex_pull> &b) {
+        el::PUSH(el::handler([a, b](){
+            pull::pull(a->source(), b->sink());
+            pull::pull(b->source(), a->sink());
+        }));
     }
 }
