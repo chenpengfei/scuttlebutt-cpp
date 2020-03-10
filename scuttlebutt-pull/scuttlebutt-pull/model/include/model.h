@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "scuttlebutt-pull/scuttlebutt/include/scuttlebutt.h"
+#include "event-loop/include/event-loop.h"
 
 namespace sb {
 
@@ -17,6 +18,7 @@ namespace sb {
         }
 
         model &set(const std::string &k, const std::string &v) {
+
             logger->info("set: k:({}) v({})", k, v);
 
             local_update(std::make_pair(k, v));
