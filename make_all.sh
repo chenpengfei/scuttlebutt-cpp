@@ -44,7 +44,6 @@ make -j 4
 
 # Run Test
 ./pull-stream/test/pull-stream-test
-./event-loop/test/event-loop-test
 
 cd ../
 
